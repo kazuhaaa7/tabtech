@@ -243,7 +243,7 @@ def main_menu():
         if pilihan == '1':
             login()
         elif pilihan == '2':
-            print("Terima kasih telah menggunakan sistem ini!")
+            print("Terima kasih telah menggunakan sistem ==marketplace ini!")
             exit()
         else:
             input("Pilihan tidak valid! Tekan Enter untuk mencoba lagi...")
