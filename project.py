@@ -3,14 +3,73 @@ import os
 import pandas as pd
 from tabulate import tabulate
 from datetime import datetime
-from time import time
+import time
 import numpy as np
+import psycopg2
+from psycopg2 import Error
+from db.database import connect_db
 
-FILE_USER = 'user.csv'
-FILE_SALDO = 'saldo.csv'
-FILE_TRANSAKSI = 'transaksi.csv'
 FILE_TABUNGAN = 'tabungan.csv'
 
+
+# ------------------------ FUNGSI REGISTER ------------------------
+def registrasi():
+    os.system('cls')
+    connection = connect_db()
+    if connection is None:
+        print("Koneksi tidak berhasil")
+        return
+    
+    try:
+        cursor = connection.cursor()
+        print("=== REGISTER USER ===\n")
+
+        while True:
+            username = input("Isi Username: ").strip().lower()
+            if username == '':
+                print('\n username tidak boleh angka')
+                input('Tekan Enter untuk kembali...')
+                return
+            if username.isdigit():
+                print('\n username tidak boleh ada unsur angka')
+                input('Tekan Enter untuk kembali...')
+
+
+            
+            while True:
+                password = input("Isi Password: ").strip().lower()
+                if password == '':
+                    print('\n username tidak boleh angka')
+                    input('Tekan Enter untuk kembali...')
+                    return
+            
+                insert_query ="""
+                INSERT INTO users.pengguna (username, pw)
+                VALUES (%s,%s)"""
+
+            
+                cursor.execute(insert_query,(username, password))
+                connection.commit()
+
+                print("\n Registrasi akun telah berhasil")
+                print(f"Wellcome {username} ")
+                input("Tekan Enter untuk melanjutkan...")
+                cursor.close()
+                connection.close()
+                os.system('cls')
+                return
+    except Error as error:
+        print(f"terjadi kesalahan saat registrasi {error}")
+        os.system('cls')
+        if connection:
+            connection.close()
+        
+    finally:
+        if cursor:
+            try:
+                cursor.close()
+            except:
+                pass
 
 # ------------------------ FUNGSI LOGIN ------------------------
 def login():
@@ -66,75 +125,93 @@ def menu_user1(username):
 
 # ------------------------ Tambah Saldo -- UserTabungan ------------------------
 def tambahSaldo(username):
-    os.system('cls')
-    print('Halaman Tabungan')
+    while True: 
+        os.system('cls')
+        print('Halaman Tabungan')
 
+        if not os.path.exists(FILE_TABUNGAN):
+            with open(FILE_TABUNGAN, 'w', newline= '' ) as file_saldo :
+                csv.writer(file_saldo).writerow(['No', 'Tanggal', 'Debet', 'Kredit', 'Saldo', 'Keterangan', 'Username'])
+        
+        df_tabungan = pd.read_csv(FILE_TABUNGAN)
 
-    if not os.path.exists(FILE_TABUNGAN):
-        with open(FILE_TABUNGAN, 'w', newline= '' ) as file_saldo :
-            csv.writer(file_saldo).writerow(['No', 'Tanggal', 'Debet', 'Kredit', 'Saldo', 'Keterangan'])
-    
-    df_tabungan = pd.read_csv(FILE_TABUNGAN)
-
-    print(tabulate(df_tabungan, headers='keys', tablefmt='fancy_grid', showindex=False))
-
-    tambahSaldo = int(input("Masukkan saldo yang ingin ditambahkan: "))
-    try:
-        verif = input(f'Kamu yakin untuk menambah saldo sebesar {tambahSaldo}? [y]/[n] ').strip().lower()
-        if verif == 'y':
-            keterangan = input("Masukkan kepentingan anda: ")
-        elif verif == 'n':
-            print("Penambahan saldo dibatalkan")
-            input('Ketik Enter untuk kembali...')
+        print(tabulate(df_tabungan, headers='keys', tablefmt='fancy_grid', showindex=False))
+        tambahSaldo = input("Masukkan saldo yang ingin ditambahkan: ")
+        # pemeriksaan int empty tidak bisa, so... perlu perlu convert dri str ke int
+        if not tambahSaldo :
+            print('Form saldo yang akan dimasukkan tidak boleh kosong ')
+            input('Ketik Enter untuk melanjutkan...')
             return
         else:
-            print("Masukkan abjad dengan sesuai ya...")
-            input('Ketik Enter untuk kembali...')
-            return
-    except ValueError:
-        print("Error verifikasi saldo")
-        input("Ketik Enter untuk kembali...")
+            try:
+                tambahSaldo == int(tambahSaldo)
+                print("angka yg dimasukkan:", tambahSaldo)
+            except:
+                input("input harus berupa angka ya...")
+                return
+            
+        try:
+            verif = input(f'Kamu yakin untuk menambah saldo sebesar {tambahSaldo}? [y]/[n] ').strip().lower()
+            if verif == 'y':
+                keterangan = input("Masukkan kepentingan anda: ")
+                if not keterangan:
+                    print('Form keterangan yang akan dimasukkan tidak boleh kosong ')
+                    input('Ketik Enter untuk melanjutkan')
+                    return
+
+            elif verif == 'n':
+                print("Penambahan saldo dibatalkan")
+                input('Ketik Enter untuk kembali...')
+                return
+            else:
+                print("Masukkan abjad dengan sesuai ya...")
+                input('Ketik Enter untuk kembali...')
+                return
+        except ValueError:
+            print("Error verifikasi saldo")
+            input("Ketik Enter untuk kembali...")
 
 
-    if not df_tabungan.empty:
-        no = df_tabungan['No'].max() + 1
-    else:
-        no = df_tabungan['No'] = 1
+        if not df_tabungan.empty:
+            no = df_tabungan['No'].max() + 1
+        else:
+            no = df_tabungan['No'] = 1
 
-    # df_saldo['Debet'] = df_saldo['Debet'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.').replace('.', ',', 1))
-    # df_saldo['Kredit'] = df_saldo['Kredit'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.').replace('.', ',', 1))
-    # df_saldo['Saldo'] = df_saldo['Saldo'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.').replace('.', ',', 1))
+        # df_saldo['Debet'] = df_saldo['Debet'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.').replace('.', ',', 1))
+        # df_saldo['Kredit'] = df_saldo['Kredit'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.').replace('.', ',', 1))
+        # df_saldo['Saldo'] = df_saldo['Saldo'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.').replace('.', ',', 1))
 
-    if df_tabungan['Saldo'].empty:
-        saldoTerakhir = 0
-    else:
-        saldoTerakhir = df_tabungan['Saldo'].iloc[-1]
+        if df_tabungan['Saldo'].empty:
+            saldoTerakhir = 0
+        else:
+            saldoTerakhir = df_tabungan['Saldo'].iloc[-1]
 
-    kredit = 0
-    saldoSum = saldoTerakhir + tambahSaldo
-
-
-    newrow = {
-        'No' : no,
-        'Tanggal' : datetime.now().strftime('%d-%m-%Y'),
-        'Debet' : tambahSaldo,
-        'Kredit' : kredit,
-        'Saldo' : saldoSum,
-        'Keterangan' : keterangan
-        }
+        kredit = 0
+        saldoSum = saldoTerakhir + tambahSaldo
 
 
+        newrow = {
+            'No' : no,
+            'Tanggal' : datetime.now().strftime('%d-%m-%Y'),
+            'Debet' : tambahSaldo,
+            'Kredit' : kredit,
+            'Saldo' : saldoSum,
+            'Keterangan' : keterangan,
+            'Username': username
+            }
 
-    with open(FILE_TABUNGAN, 'a', newline= '') as newline:
-        writer = csv.writer(newline)
-        writer.writerow([[newrow['No'], newrow['Tanggal'], newrow['Debet'], newrow['Kredit'], newrow['Saldo'], newrow['Keterangan']]])
-    
-    df_tabungan = pd.concat([df_tabungan, pd.DataFrame([newrow])], ignore_index=True)
-    df_tabungan.to_csv(FILE_TABUNGAN, index=False)
 
-    print(f"\nUser {username} berhasil menambahkan saldo)")
-    input("\nKetik Enter untuk lanjut...")
-    return
+
+        with open(FILE_TABUNGAN, 'a', newline= '') as newline:
+            writer = csv.writer(newline)
+            writer.writerow([[newrow['No'], newrow['Tanggal'], newrow['Debet'], newrow['Kredit'], newrow['Saldo'], newrow['Keterangan']]])
+        
+        df_tabungan = pd.concat([df_tabungan, pd.DataFrame([newrow])], ignore_index=True)
+        df_tabungan.to_csv(FILE_TABUNGAN, index=False)
+
+        print(f"\nUser {username} berhasil menambahkan saldo)")
+        input("\nKetik Enter untuk lanjut...")
+        return
 
 # ------------------------ Tambah Kredit -- UserTabungan ------------------------
 def tambahKredit(username):
@@ -143,16 +220,34 @@ def tambahKredit(username):
 
     if not os.path.exists(FILE_TABUNGAN):
         with open(FILE_TABUNGAN, 'w', newline= '' ) as file_transaksi :
-            csv.writer(file_transaksi).writerow(['No', 'Tanggal', 'Debet', 'Kredit', 'Saldo', 'Keterangan'])
+            csv.writer(file_transaksi).writerow(['No', 'Tanggal', 'Debet', 'Kredit', 'Saldo', 'Keterangan', 'Username'])
     
     df_transksi = pd.read_csv(FILE_TABUNGAN)
     print(tabulate(df_transksi, headers='keys', tablefmt='fancy_grid', showindex=False))
 
-    tambahTransaksi = int(input("Masukkan kredit yang ingin ditambahkan: "))
+    tambahTransaksi = input("Masukkan kredit yang ingin ditambahkan: ")
+# pemeriksaan int empty tidak bisa, so... perlu perlu convert dri str ke int
+    if not tambahTransaksi :
+            print('Form kredit yang akan dimasukkan tidak boleh kosong ')
+            input('Ketik Enter untuk melanjutkan...')
+            return
+    else:
+            try:
+                tambahTransaksi == int(tambahTransaksi)
+                print("angka yg dimasukkan:", tambahTransaksi)
+            except:
+                input("input harus berupa angka ya...")
+                return
+
     try:
         verif = input(f'Kamu yakin untuk menambah kredit sebesar {tambahTransaksi}? [y]/[n] ').strip().lower()
         if verif == 'y':
             keterangan = input("Masukkan kepentingan anda: ")
+
+            if not keterangan:
+                print('Form keterangan yang akan dimasukkan tidak boleh kosong ')
+                input('Ketik Enter untuk melanjutkan')
+                return
         elif verif == 'n':
             print("Penambahan saldo dibatalkan")
             input('Ketik Enter untuk kembali...')
@@ -190,7 +285,8 @@ def tambahKredit(username):
         'Debet' : debet,
         'Kredit' : tambahTransaksi,
         'Saldo' : saldoSum,
-        'Keterangan' : keterangan
+        'Keterangan' : keterangan,
+        'Username': username
         }
 
 
@@ -236,13 +332,21 @@ def main_menu():
         print("    TABUNGAN SEDERHANA    ")
         print("===================================================================")
         print("1. Login")
-        print("2. Keluar")
+        print("2. Registrasi")
+        print("3. Keluar")
         print("===================================================================")
         pilihan = input("Pilih menu (1/2): ").strip()
 
         if pilihan == '1':
+            print('Tunggu sebentar')
+            time.sleep(2)
             login()
         elif pilihan == '2':
+            print('Tunggu sebentar')
+            time.sleep(2)       
+            registrasi()
+
+        elif pilihan == '3':
             print("Terima kasih telah menggunakan sistem ==marketplace ini!")
             exit()
         else:
