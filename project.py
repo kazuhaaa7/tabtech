@@ -8,96 +8,198 @@ import numpy as np
 import psycopg2
 from psycopg2 import Error
 from db.database import connect_db
+from dotenv import load_dotenv 
+
+
+
 
 FILE_TABUNGAN = 'tabungan.csv'
+load_dotenv('config/.venv')
 
+def registrasi():
+    while True:
+        os.system('cls')
+        print(""" 
+Please select the type of actor
+1. User Savings
+2. Admin * into maintanence
+3. Back To Menu
+""")
+        typeActor = input('Select (1-3): ')
+        while True:
+            if typeActor == '1' or typeActor == 'user savings':
+                regisUserSavings()
+                return
+            elif typeActor == '2' or typeActor == 'admin':
+                print('into maintence')
+                return
+            elif typeActor == '3' or typeActor == 'back to menu':
+                return
+            else:
+                print('Menu not ready')
+                os.system('cls')
+                return
 
 # ------------------------ FUNGSI REGISTER ------------------------
-def registrasi():
-    os.system('cls')
-    connection = connect_db()
-    if connection is None:
-        print("Koneksi tidak berhasil")
-        return
-    
-    try:
-        cursor = connection.cursor()
-        print("=== REGISTER USER ===\n")
+def regisUserSavings():
+    while True:
+        os.system('cls')
+        connection = connect_db()
+        if connection is None:
+            print("Koneksi tidak berhasil")
+            return
+        
+        try:
+            cursor = connection.cursor()
+            print("=== REGISTER USER ===\n")
 
-        while True:
-            username = input("Isi Username: ").strip().lower()
-            if username == '':
-                print('\n username tidak boleh angka')
-                input('Tekan Enter untuk kembali...')
-                return
-            if username.isdigit():
-                print('\n username tidak boleh ada unsur angka')
-                input('Tekan Enter untuk kembali...')
+            while True:
+                username = input("Isi Username: ").strip().lower()
+                if username == '':
+                    print('\n username tidak boleh angka')
+                    input('Tekan Enter untuk kembali...')
+                    return
+                elif username.isdigit():
+                    print('\n username tidak boleh ada unsur angka')
+                    input('Tekan Enter untuk kembali...')
 
+                    # cek user unik not duplicated
+                check_query = """
+                SELECT username FROM users.pengguna WHERE username = %s
+                """
+                cursor.execute(check_query, (username,))
+                check_user = cursor.fetchone()
 
-            
+                if check_user:
+                    print("\nUsername sudah digunakan! Silahkan gunakan username lain.")
+                    input("Tekan Enter untuk kembali...")
+                    continue
+                else:
+                    break
+                
             while True:
                 password = input("Isi Password: ").strip().lower()
                 if password == '':
                     print('\n username tidak boleh angka')
                     input('Tekan Enter untuk kembali...')
-                    return
-            
-                insert_query ="""
-                INSERT INTO users.pengguna (username, pw)
-                VALUES (%s,%s)"""
+                    continue
+                else:
+                    os.system('cls')
+                    break
+            role = "User Tabungan"
 
+            # Query: ambl role 
+            cursor.execute("SELECT roles FROM users.pengguna WHERE roles = %s", (role,))
+            # row = cursor.fetchone()
+            # if row:
+            #     roles = role[0]
+                
             
-                cursor.execute(insert_query,(username, password))
-                connection.commit()
+            # insert all data (for regis)
+            insert_query ="""
+            INSERT INTO users.pengguna (username, pw, roles)
+            VALUES (%s,%s, %s)"""
 
-                print("\n Registrasi akun telah berhasil")
-                print(f"Wellcome {username} ")
-                input("Tekan Enter untuk melanjutkan...")
-                cursor.close()
-                connection.close()
-                os.system('cls')
-                return
-    except Error as error:
-        print(f"terjadi kesalahan saat registrasi {error}")
-        os.system('cls')
-        if connection:
+            cursor.execute(insert_query,(username, password, role))
+            connection.commit()
+
+            print("\n Registrasi akun telah berhasil")
+            print(f"Wellcome {username} ")
+
+            input("Tekan Enter untuk melanjutkan...")
+            cursor.close()
             connection.close()
+            os.system('cls')
+            return
         
-    finally:
-        if cursor:
-            try:
-                cursor.close()
-            except:
-                pass
+        except Error as error:
+            print(f"terjadi kesalahan saat registrasi {error}")
+            os.system('cls')
+            if connection:
+                connection.close()
+            
+        finally:
+            if cursor:
+                try:
+                    cursor.close()
+                except:
+                    pass
 
 # ------------------------ FUNGSI LOGIN ------------------------
-def login():
-    os.system('cls')
-    print("============================[ LOGIN ]============================")
-    username = input("Masukkan username: ").strip().lower()
-    password = input("Masukkan password: ").strip().lower()
+def validasiLogin():
+    while True:
+        load_dotenv('config/.venv')
+        os.system('cls')
+        connection = connect_db()
+        if connection is None:
+            print("Koneksi database gagal!")
+            return None
+        
+        try:
+            cursor = connection.cursor()
+            
+            print("============================[ LOGIN ]============================")
+            print("Ketik 1 uhntuk kembali ke halaman utama")
+            
+            while True:
+                username = input("Masukkan username: ").strip().lower()
 
-    with open(FILE_USER, 'r', newline='') as file: 
-        reader = csv.DictReader(file) 
-        for row in reader:
-            if row['username'] == username and row['password'] == password:
-                role = row['role']
-                print(f"\nLogin berhasil! Selamat datang, {username} | ({role})")
-                input("Tekan Enter untuk ke program selanjutnya...")
-                if role == 'userTabungan1':
-                    menu_user1(username)
+                if username == '1':
+                    os.system('cls')
+                    connection.close()
+                    cursor.close()
                     return
-                if role == 'userTabungan2':
-                    menu_user1(username)
+                if username == '':
+                    print("\nUsername tidak boleh kosong")
+                    return None
+                else:break
+            
+            while True:
+                password = input("Masukkan password: ").strip()
+                if password == '1':
+                    os.system('cls')
+                    connection.close()
+                    cursor.close()
                     return
-                # else: 
-                #     print("Username atau Password salah, dimohon untuk periksa ulang")
-                #     input("Ketik Enter untuk kembali...")
-                #     return 
+                if password == '':
+                    print("\nPassword tidak boleh kosong")
+                    return None
+                else:break
+            # Query: ambil username dan pw untuk validasi login
+            check_query = """
+            SELECT pengguna.username, pengguna.pw, pengguna.roles FROM users.pengguna
+            WHERE username = %s AND pw = %s
+            """
+            cursor.execute(check_query, (username, password))
+            check_user = cursor.fetchone()
+            print(check_user)
 
-    print("\nUsername atau password salah!")
-    input("Tekan Enter untuk mencoba lagi...")
+
+            if check_user:
+                # login sukses -> ambil data dan arahkan hslaman sesuai role
+                os.system('cls')
+                name = check_user[0]
+                role = check_user[2]
+                print(f"\nbro {name} as {role}Login berhasil")
+                input("Tekan Enter untuk melanjutkan...")
+                return (check_user[0], check_user[2])
+
+            else:
+                os.system('cls')
+                print('Username or Pw is wrong')
+                input('Hold Enter for try again...')
+                cursor.close()
+                connection.close()
+                return None
+
+        except Error as error:
+            print(error)
+        
+        finally:
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()
 
 # ------------------------ MENU ADMIN ------------------------
 def menu_user1(username):
@@ -335,16 +437,21 @@ def main_menu():
         print("2. Registrasi")
         print("3. Keluar")
         print("===================================================================")
-        pilihan = input("Pilih menu (1/2): ").strip()
+        pilihan = input("Pilih menu (1/2/3): ").strip()
 
         if pilihan == '1':
             print('Tunggu sebentar')
             time.sleep(2)
-            login()
+            result = validasiLogin()
+            if result :
+                role = result
+                if role == 'User Tabungan':
+                    menu_user1()
         elif pilihan == '2':
             print('Tunggu sebentar')
             time.sleep(2)       
             registrasi()
+            return
 
         elif pilihan == '3':
             print("Terima kasih telah menggunakan sistem ==marketplace ini!")

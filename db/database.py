@@ -1,5 +1,4 @@
 import psycopg2
-from psycopg2 import Error
 from dotenv import load_dotenv 
 import os
 
