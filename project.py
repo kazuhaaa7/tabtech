@@ -14,7 +14,6 @@ from dotenv import load_dotenv
 
 
 FILE_TABUNGAN = 'tabungan.csv'
-load_dotenv('config/.venv')
 
 def registrasi():
     while True:
@@ -128,7 +127,6 @@ def regisUserSavings():
 # ------------------------ FUNGSI LOGIN ------------------------
 def validasiLogin():
     while True:
-        load_dotenv('config/.venv')
         os.system('cls')
         connection = connect_db()
         if connection is None:
@@ -138,7 +136,7 @@ def validasiLogin():
         try:
             cursor = connection.cursor()
             
-            print("============================[ LOGIN ]============================")
+            print("\n============================[ LOGIN ]============================")
             print("Ketik 1 uhntuk kembali ke halaman utama")
             
             while True:
@@ -148,6 +146,7 @@ def validasiLogin():
                     os.system('cls')
                     connection.close()
                     cursor.close()
+                    time.sleep("Thanks a lot")
                     return
                 if username == '':
                     print("\nUsername tidak boleh kosong")
@@ -156,11 +155,6 @@ def validasiLogin():
             
             while True:
                 password = input("Masukkan password: ").strip()
-                if password == '1':
-                    os.system('cls')
-                    connection.close()
-                    cursor.close()
-                    return
                 if password == '':
                     print("\nPassword tidak boleh kosong")
                     return None
@@ -172,7 +166,6 @@ def validasiLogin():
             """
             cursor.execute(check_query, (username, password))
             check_user = cursor.fetchone()
-            print(check_user)
 
 
             if check_user:
@@ -182,19 +175,37 @@ def validasiLogin():
                 role = check_user[2]
                 print(f"\nbro {name} as {role}Login berhasil")
                 input("Tekan Enter untuk melanjutkan...")
-                return (check_user[0], check_user[2])
 
+
+                cursor.close()
+                connection.close()
+                os.system('cls')
+
+                if role == 'User Tabungan':
+                    menu_user1(username)
+                elif role == 'admin':
+                    input("masih maintanence")
+                else:
+                    # role tidak dikenali -> arahkan ke menu utama
+                    print("Role tidak dikenali")
+                    validasiLogin()
+                return
+                
             else:
                 os.system('cls')
                 print('Username or Pw is wrong')
                 input('Hold Enter for try again...')
                 cursor.close()
                 connection.close()
-                return None
+                os.system('cls')    
+                return 
 
         except Error as error:
-            print(error)
-        
+            print(f"\Terjadi kesalahan saat login: {error}")
+            input("Tekan Enter untuk melanjutkan...")
+            if connection:
+                connection.close()
+            connection
         finally:
             if cursor:
                 cursor.close()
@@ -441,15 +452,13 @@ def main_menu():
 
         if pilihan == '1':
             print('Tunggu sebentar')
-            time.sleep(2)
             result = validasiLogin()
             if result :
                 role = result
-                if role == 'User Tabungan':
+                if role == "User Tabungan":
                     menu_user1()
         elif pilihan == '2':
             print('Tunggu sebentar')
-            time.sleep(2)       
             registrasi()
             return
 
