@@ -45,5 +45,6 @@ Pastikan PostgreSQL berjalan dan buat tabel:
 - `users.pengguna` dengan kolom: username, pw, roles
 - `tabungan.tabungan` dengan kolom: no, datee, debit, credit, balance, information, username
 
-## Lisensi
-Proyek ini untuk tujuan edukasi.
+=============================
+### created readme seperti ini
+to copilot: @workspace generate a readme document that can be used as a repo description
