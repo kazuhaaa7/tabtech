@@ -370,113 +370,213 @@ def tambahSaldo(username):
 
 # ------------------------ Tambah Kredit -- UserTabungan ------------------------
 def tambahKredit(username):
-    os.system('cls')
-    print('Halaman Tabungan')
-
-    if not os.path.exists(FILE_TABUNGAN):
-        with open(FILE_TABUNGAN, 'w', newline= '' ) as file_transaksi :
-            csv.writer(file_transaksi).writerow(['No', 'Tanggal', 'Debet', 'Kredit', 'Saldo', 'Keterangan', 'Username'])
-    
-    df_transksi = pd.read_csv(FILE_TABUNGAN)
-    print(tabulate(df_transksi, headers='keys', tablefmt='fancy_grid', showindex=False))
-
-    tambahTransaksi = input("Masukkan kredit yang ingin ditambahkan: ")
-# pemeriksaan int empty tidak bisa, so... perlu perlu convert dri str ke int
-    if not tambahTransaksi :
-            print('Form kredit yang akan dimasukkan tidak boleh kosong ')
-            input('Ketik Enter untuk melanjutkan...')
+    while True:
+        os.system('cls')
+        print('Halaman Tabungan')
+        # db
+        connection = connect_db()
+        if connection is None:
+            print("Koneksi tidak berhasil...")
             return
-    else:
-            try:
-                tambahTransaksi == int(tambahTransaksi)
-                print("angka yg dimasukkan:", tambahTransaksi)
-            except:
-                input("input harus berupa angka ya...")
-                return
 
-    try:
-        verif = input(f'Kamu yakin untuk menambah kredit sebesar {tambahTransaksi}? [y]/[n] ').strip().lower()
-        if verif == 'y':
-            keterangan = input("Masukkan kepentingan anda: ")
+        try:
+            cursor = connection.cursor()
 
-            if not keterangan:
-                print('Form keterangan yang akan dimasukkan tidak boleh kosong ')
-                input('Ketik Enter untuk melanjutkan')
+            # tampilin tabel
+            query_colum = """
+                SELECT 
+                tabungan.no,
+                tabungan.datee,
+                tabungan.debit,
+                tabungan.credit,
+                tabungan.balance,
+                tabungan.information,
+                tabungan.username
+                FROM tabungan.tabungan
+                """
+            cursor.execute(query_colum)
+            table = cursor.fetchall()
+            
+            if table:
+                os.system('cls')
+                print("page add kredit")
+                headers = ['No', 'Tanggal', 'Debet', 'Kredit', 'Saldo', 'Keterangan', 'Username']
+                print(tabulate(table, headers= headers, tablefmt='fancy_grid'))
+            else:
+                print('\n blm ada transaksi')
+                input()
+
+            tambahTransaksi = input("Masukkan kredit yang ingin ditambahkan: ")
+        # pemeriksaan int empty tidak bisa, so... perlu perlu convert dri str ke int
+            if not tambahTransaksi :
+                    print('Form kredit yang akan dimasukkan tidak boleh kosong ')
+                    input('Ketik Enter untuk melanjutkan...')
+                    os.system('cls')
+                    connection.close()
+                    cursor.close()
+                    continue
+            else:
+                try:
+                    tambahTransaksi = int(tambahTransaksi)
+                    if tambahTransaksi <= 0:
+                        print("Nominal harus lebih dari 0")
+                        continue
+                except:
+                    input("input harus angka kocak!!!!")
+                    os.system('cls')
+                    connection.close()
+                    cursor.close()
+                    break
+
+            # verifikasi
+            verif = input(f'Kamu yakin untuk menambah kredit sebesar {tambahTransaksi}? [y]/[n] ').strip().lower()
+            if verif == 'y':
+                keterangan = input("Masukkan kepentingan anda: ")
+                if not keterangan:
+                    print('Form keterangan yang akan dimasukkan tidak boleh kosong ')
+                    input('Ketik Enter untuk melanjutkan')
+                    return
+            elif verif == 'n':
+                print("Penambahan saldo dibatalkan")
+                input('Ketik Enter untuk kembali...')
+                os.system('cls')
+                connection.close()
+                cursor.close()
                 return
-        elif verif == 'n':
-            print("Penambahan saldo dibatalkan")
-            input('Ketik Enter untuk kembali...')
+            else:
+                print("Masukkan abjad dengan sesuai ya...")
+                input('Ketik Enter untuk kembali...')
+                os.system('cls')
+                connection.close()
+                cursor.close()
+                return tambahKredit()
+            
+
+            cursor.execute("""
+                            SELECT MAX(no)
+                            FROM tabungan.tabungan                           
+                            """)
+            idx = cursor.fetchone()[0]
+            no = (idx or 0) + 1
+
+            isi_saldo = """
+                        SELECT
+                        t.balance
+                        FROM tabungan.tabungan t
+                        ORDER BY no 
+                        DESC LIMIT 1 
+                            """
+            cursor.execute(isi_saldo)
+            saldo = cursor.fetchone()
+            if saldo:
+                saldoTerakhir = saldo[-1]
+            else:
+                saldoTerakhir = 0
+
+            saldoSum = saldoTerakhir - tambahTransaksi
+            tanggal = datetime.now().strftime('%Y-%m-%d')
+
+            final_saldo = """
+            INSERT INTO tabungan.tabungan 
+            (no, datee, debit, credit, balance, information, username)
+            VALUES (%s,%s,%s,%s,%s,%s,%s)
+            """
+            cursor.execute(final_saldo, (no, tanggal, 0, tambahTransaksi, saldoSum,keterangan, username))
+            connection.commit()
+
+            print(f"\nUser {username} berhasil menambahkan saldo)")
+            input("\nKetik Enter untuk lanjut...")
             return
-        else:
-            print("Masukkan abjad dengan sesuai ya...")
-            input('Ketik Enter untuk kembali...')
-            return tambahKredit()
-    except ValueError:
-        print("Error verifikasi kredit")
-        input("Ketik Enter untuk kembali...")
+        
 
+        except Error as error:
+            print(f"\nTerjadi kesalahan saat proses penambahan saldo: {error}")
+            os.system('cls')
+            connection.close()
+            cursor.close()
+            return
 
-    if not df_transksi.empty:
-        no = df_transksi['No'].max() + 1
-    else:
-        no = df_transksi['No'] = 1
-
-    # df_transksi['Debet'] = df_transksi['Debet'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.').replace('.', ',', 1))
-    # df_transksi['Kredit'] = df_transksi['Kredit'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.').replace('.', ',', 1))
-    # df_transksi['Saldo'] = df_transksi['Saldo'].apply(lambda x: f"Rp {x:,.0f}".replace(',', '.').replace('.', ',', 1))
-
-    if df_transksi['Saldo'].empty:
-        saldoTerakhir = 0
-    else:
-        saldoTerakhir = df_transksi['Saldo'].iloc[-1]
-
-    debet = 0
-    saldoSum = saldoTerakhir - tambahTransaksi
-
-
-    newrow = {
-        'No' : no,
-        'Tanggal' : datetime.now().strftime('%d-%m-%Y'),
-        'Debet' : debet,
-        'Kredit' : tambahTransaksi,
-        'Saldo' : saldoSum,
-        'Keterangan' : keterangan,
-        'Username': username
-        }
-
-
-    with open(FILE_TABUNGAN, 'a', newline= '') as newline:
-        writer = csv.writer(newline)
-        writer.writerow([[newrow['No'], newrow['Tanggal'], newrow['Debet'], newrow['Kredit'], newrow['Saldo'], newrow['Keterangan']]])
-    
-    df_transksi = pd.concat([df_transksi, pd.DataFrame([newrow])], ignore_index=True)
-    df_transksi.to_csv(FILE_TABUNGAN, index=False)
-
-    print(f"\nUser {username} berhasil menambahkan saldo)")
-    input("\nKetik Enter untuk lanjut...")
-    return
+        finally:
+            connection.close()
+            cursor.close()
 
 # ------------------------ Daftar Riwayat --  UserTabungan ------------------------
 def daftarRiwayat():
-    os.system('cls')
-    print("Halaman Daftar Riwayat Tabungan")
+    while True: 
+        os.system('cls')
+        print("Halaman Daftar Riwayat Tabungan")
+        connection = connect_db()
+        if connection is None:
+            print("Koneksi tidak berhasil...")
+            return
+        try:
+            cursor = connection.cursor()
+            query_column = """
+            SELECT
+            t.no,
+            t.datee,
+            t.debit,
+            t.credit,
+            t.balance,
+            t.information,
+            t.username
+            FROM tabungan.tabungan t
+            """
+            cursor.execute(query_column)
+            table = cursor.fetchall()
 
-    if not os.path.exists(FILE_TABUNGAN):
-        with open(FILE_TABUNGAN, 'w', newline='') as file_tabungan:
-            csv.writer(file_tabungan).writerow(['No', 'Tanggal', 'Debet', 'Kredit', 'Saldo', 'Keterangan'])
+            if table:
+                os.system('cls')
+                print("halaman keseluruhan")
+                headers = ['No', 'Tanggal', 'Debet', 'Kredit', 'Saldo', 'Keterangan', 'Username']
+                print(tabulate(table, headers= headers, tablefmt='fancy_grid'))
+            else:
+                print('\n blm ada transaksi')
+                input()
+            while True:
 
-    df_tabungan = pd.read_csv(FILE_TABUNGAN)
-    print(tabulate(df_tabungan, headers='keys', tablefmt='fancy_grid', showindex=False))
-    input("neext")
-    sumSaldo = df_tabungan['Saldo'].iloc[-1]
-    sumDebet = df_tabungan['Debet'].sum()
-    sumKredit = df_tabungan['Kredit'].sum()
+                quer_2 = """
+                SELECT 
+                COALESCE(SUM(t.debit), 0),
+                COALESCE(SUM(t.credit), 0)
+                FROM tabungan.tabungan t
+                """
+                cursor.execute(quer_2)
+                sumDebet, sumKredit = cursor.fetchone()
 
-    print("Rangkuman:")
-    print("Total Saldo: " f"Rp {sumSaldo:,}")
-    print("Total Uang Masuk: " f"Rp {sumDebet:,}")
-    print("Total Uang Keluar: " f"Rp {sumKredit:,}")
-    input("next")
+
+                query = """
+                SELECT
+                t.balance
+                FROM tabungan.tabungan t
+                ORDER BY no DESC
+                LIMIT 1
+                """
+                cursor.execute(query)
+                last = cursor.fetchone()
+                if last:
+                    saldoAkhir = last[-1]
+                else:
+                    saldoAkhir = 0
+
+                print("Rangkuman:")
+                print("Total Saldo: " f"Rp {saldoAkhir:,}")
+                print("Total Uang Masuk: " f"Rp {sumDebet:,}")
+                print("Total Uang Keluar: " f"Rp {sumKredit:,}")
+                input()
+                return
+
+        except Error as error:
+            print(f"\nTerjadi kesalahan saat proses penambahan saldo: {error}")
+            os.system('cls')
+            connection.close()
+            cursor.close()
+            return
+
+        finally:
+            connection.close()
+            cursor.close()
+
 
 
 # # ------------------------ MENU UTAMA ------------------------
