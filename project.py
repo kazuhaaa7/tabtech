@@ -146,7 +146,8 @@ def validasiLogin():
                     os.system('cls')
                     connection.close()
                     cursor.close()
-                    time.sleep("Thanks a lot")
+                    print("Thanks a lot")
+                    time.sleep(1)
                     return
                 if username == '':
                     print("\nUsername tidak boleh kosong")
@@ -216,7 +217,7 @@ def validasiLogin():
 def menu_user1(username):
     while True:
         os.system('cls')
-        print(f"=== MENU ADMIN ===\nHalo {username}")
+        print(f"=== MENU User Tabungan ===\nHalo {username}")
         print("1. Tambah Saldo")
         print("2. Tambah Kredit")
         print("3. Riwayat Tabungan")
@@ -235,6 +236,7 @@ def menu_user1(username):
         else:
             print("Pilihan tidak valid!")
             input("Tekan Enter...")
+            return
 
 # ------------------------ Tambah Saldo -- UserTabungan ------------------------
 def tambahSaldo(username):
@@ -278,7 +280,7 @@ def tambahSaldo(username):
             tambahIsiSaldo = input("Masukkan saldo yang ingin ditambahkan: ")
             # pemeriksaan int empty tidak bisa, so... perlu perlu convert dri str ke int
             if not tambahIsiSaldo :
-                print('Form saldo yang akan dimasukkan tidak boleh kosong ')
+                print('\nForm saldo yang akan dimasukkan tidak boleh kosong ')
                 input('Ketik Enter untuk melanjutkan...')
                 os.system('cls')
                 connection.close()
@@ -292,7 +294,7 @@ def tambahSaldo(username):
                         continue
                     print("angka yg dimasukkan:", tambahIsiSaldo)
                 except:
-                    input("input harus angka kocak!!!!")
+                    input("input harus angka!!!!")
                     os.system('cls')
                     connection.close()
                     cursor.close()
@@ -302,7 +304,7 @@ def tambahSaldo(username):
             if verif == 'y':
                 keterangan = input("Masukkan kepentingan anda: ")
                 if not keterangan:
-                    print('Form keterangan yang akan dimasukkan tidak boleh kosong ')
+                    print("\nForm keterangan yang akan dimasukkan tidak boleh kosong ")
                     input('Ketik Enter untuk melanjutkan')
                     return
 
@@ -353,7 +355,7 @@ def tambahSaldo(username):
             connection.commit()
 
             print(f"\nUser {username} berhasil menambahkan saldo)")
-            input("\nKetik Enter untuk lanjut...")
+            input("Ketik Enter untuk lanjut...")
             return
         
         
@@ -409,7 +411,7 @@ def tambahKredit(username):
             tambahTransaksi = input("Masukkan kredit yang ingin ditambahkan: ")
         # pemeriksaan int empty tidak bisa, so... perlu perlu convert dri str ke int
             if not tambahTransaksi :
-                    print('Form kredit yang akan dimasukkan tidak boleh kosong ')
+                    print('\nForm kredit yang akan dimasukkan tidak boleh kosong ')
                     input('Ketik Enter untuk melanjutkan...')
                     os.system('cls')
                     connection.close()
@@ -422,7 +424,7 @@ def tambahKredit(username):
                         print("Nominal harus lebih dari 0")
                         continue
                 except:
-                    input("input harus angka kocak!!!!")
+                    input("input harus angka!!!!")
                     os.system('cls')
                     connection.close()
                     cursor.close()
@@ -433,7 +435,7 @@ def tambahKredit(username):
             if verif == 'y':
                 keterangan = input("Masukkan kepentingan anda: ")
                 if not keterangan:
-                    print('Form keterangan yang akan dimasukkan tidak boleh kosong ')
+                    print('\nForm keterangan yang akan dimasukkan tidak boleh kosong ')
                     input('Ketik Enter untuk melanjutkan')
                     return
             elif verif == 'n':
@@ -563,7 +565,7 @@ def daftarRiwayat():
                 print("Total Saldo: " f"Rp {saldoAkhir:,}")
                 print("Total Uang Masuk: " f"Rp {sumDebet:,}")
                 print("Total Uang Keluar: " f"Rp {sumKredit:,}")
-                input()
+                input('Tekan Enter untuk kembali...')
                 return
 
         except Error as error:
@@ -590,8 +592,8 @@ def main_menu():
         print("2. Registrasi")
         print("3. Keluar")
         print("===================================================================")
-        pilihan = input("Pilih menu (1/2/3): ").strip()
 
+        pilihan = input("Pilih menu (1-3): ").strip()
         if pilihan == '1':
             print('Tunggu sebentar')
             time.sleep(0.5)
