@@ -42,6 +42,49 @@ Sistem tabungan sederhana berbasis console yang memungkinkan pengguna untuk mend
         ├── pydoc.bat
         └── python3v
 
+## Struktur Proyek
+```
+.
+├── .env
+├── .gitignore
+├── .txt
+├── main.py
+├── README.md
+├── __pycache__/
+├── Logic-database/
+│   ├── .env
+│   ├── .gitignore
+│   ├── project.py
+│   └── db/
+│       ├── database.py
+│       └── __pycache__/
+└── virtual/
+    ├── CACHEDIR.TAG
+    ├── pyvenv.cfg
+    ├── Lib/
+    │   └── site-packages/
+    │       ├── _virtualenv.pth
+    │       ├── _virtualenv.py
+    │       ├── pip-25.3.virtualenv
+    │       ├── __pycache__/
+    │       ├── blinker/
+    │       ├── blinker-1.9.0.dist-info/
+    │       ├── click/
+    │       ├── click-8.3.1.dist-info/
+    │       ├── colorama/
+    │       └── ...
+    └── Scripts/
+        ├── activate
+        ├── activate_this.py
+        ├── activate.bat
+        ├── activate.fish
+        ├── activate.nu
+        ├── activate.ps1
+        ├── deactivate.bat
+        ├── pydoc.bat
+        └── python3
+```
+
 ## Fitur
 - Registrasi pengguna dengan role "User Tabungan"
 - Login dengan validasi username dan password
@@ -82,5 +125,5 @@ Pastikan PostgreSQL berjalan dan buat tabel:
 - `users.pengguna` dengan kolom: username, pw, roles
 - `tabungan.tabungan` dengan kolom: no, datee, debit, credit, balance, information, username
 
-## Created readme seperti ini
-to copilot: @workspace generate a readme document that can be used as a repo description
+## To Copilot
+@workspace generate a readme document that can be used as a repo description
