@@ -7,4 +7,4 @@ Git Bash tidak mengubah struktur file, hanya meniru terminal — jadi tetap ikut
 Windows     Git Bash        source myenv/Scripts/activate | bisa dijalankan mode develompen (ex:oci)
 Windows     PowerShell      myenv\Scripts\Activate.ps1
 Windows     CMD             myenv\Scripts\activate (disarankan)
-Linux/macOS Bash/Zsh        source myenv/bin/activate
+Linux/macOS Bash/Zsh        source myenv/bin/activate 
