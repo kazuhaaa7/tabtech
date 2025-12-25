@@ -1,5 +1,3 @@
-Sistem tabungan sederhana berbasis console 
-
 # Sistem Tabungan Sederhana
 
 ## Deskripsi
@@ -45,6 +43,5 @@ Pastikan PostgreSQL berjalan dan buat tabel:
 - `users.pengguna` dengan kolom: username, pw, roles
 - `tabungan.tabungan` dengan kolom: no, datee, debit, credit, balance, information, username
 
-=============================
-### created readme seperti ini
+## Created readme seperti ini
 to copilot: @workspace generate a readme document that can be used as a repo description
