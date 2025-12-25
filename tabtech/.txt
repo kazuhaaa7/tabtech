@@ -1,0 +1,10 @@
+edangkan bin/activate hanya ada di Linux/macOS.
+venv di Windows → pakai folder Scripts
+venv di Linux/macOS → pakai folder bin
+Git Bash tidak mengubah struktur file, hanya meniru terminal — jadi tetap ikuti struktur Windows.
+
+
+Windows     Git Bash        source myenv/Scripts/activate | bisa dijalankan mode develompen (ex:oci)
+Windows     PowerShell      myenv\Scripts\Activate.ps1
+Windows     CMD             myenv\Scripts\activate (disarankan)
+Linux/macOS Bash/Zsh        source myenv/bin/activate 
