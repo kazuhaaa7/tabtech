@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+</head>
+<body>
+    <h1> Hello page </h1>
+    <h2> Nama saya :{{nama}} <br> 
+         Umur saya : {{umur}} <br>
+         buah kesukaan saya : {{list[1]}}
+    </h2>
+    <!-- cara looping list di html -->
+    {% for i in list%}
+        <p>{{i}}</p>
+    {% endfor %}
+
+    <!-- cara looping dict di html-->
+    {% for key, value in dictbos.items() %}
+        <p> {{key}} : {{value}}</p>
+    {% endfor %}
+</body>
+</html>

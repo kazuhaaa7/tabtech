@@ -2,88 +2,27 @@
 
 ## Deskripsi
 Sistem tabungan sederhana berbasis console yang memungkinkan pengguna untuk mendaftar, login, menambah saldo (debit), menambah kredit, dan melihat riwayat tabungan. Sistem ini menggunakan PostgreSQL sebagai database dan dirancang untuk operasi dasar tabungan.
-.
-├── .env
-├── .gitignore
-├── .txt
-├── main.py
-├── README.md
-├── __pycache__/
-├── Logic-database/
-│   ├── .env
-│   ├── .gitignore
-│   ├── project.py
-│   └── db/
-│       ├── database.py
-│       └── __pycache__/
-└── virtual/
-    ├── CACHEDIR.TAG
-    ├── pyvenv.cfg
-    ├── Lib/
-    │   └── site-packages/
-    │       ├── _virtualenv.pth
-    │       ├── _virtualenv.py
-    │       ├── pip-25.3.virtualenv
-    │       ├── __pycache__/
-    │       ├── blinker/
-    │       ├── blinker-1.9.0.dist-info/
-    │       ├── click/
-    │       ├── click-8.3.1.dist-info/
-    │       ├── colorama/
-    │       └── ...
-    └── Scripts/
-        ├── activate
-        ├── activate_this.py
-        ├── activate.bat
-        ├── activate.fish
-        ├── activate.nu
-        ├── activate.ps1
-        ├── deactivate.bat
-        ├── pydoc.bat
-        └── python3v
 
 ## Struktur Proyek
-```
-.
 ├── .env
 ├── .gitignore
 ├── .txt
 ├── main.py
 ├── README.md
-├── __pycache__/
+├── pycache/
 ├── Logic-database/
-│   ├── .env
-│   ├── .gitignore
-│   ├── project.py
-│   └── db/
-│       ├── database.py
-│       └── __pycache__/
-└── virtual/
-    ├── CACHEDIR.TAG
-    ├── pyvenv.cfg
-    ├── Lib/
-    │   └── site-packages/
-    │       ├── _virtualenv.pth
-    │       ├── _virtualenv.py
-    │       ├── pip-25.3.virtualenv
-    │       ├── __pycache__/
-    │       ├── blinker/
-    │       ├── blinker-1.9.0.dist-info/
-    │       ├── click/
-    │       ├── click-8.3.1.dist-info/
-    │       ├── colorama/
-    │       └── ...
-    └── Scripts/
-        ├── activate
-        ├── activate_this.py
-        ├── activate.bat
-        ├── activate.fish
-        ├── activate.nu
-        ├── activate.ps1
-        ├── deactivate.bat
-        ├── pydoc.bat
-        └── python3
-```
+│ ├── .env
+│ ├── .gitignore
+│ ├── project.py
+│ └── db/
+│ ├── database.py
+│ └── pycache/
+└── tabtech/
+├── pyvenv.cfg
+├── Include/
+├── Lib/
+│ └── site-packages/
+└── Scripts/
 
 ## Fitur
 - Registrasi pengguna dengan role "User Tabungan"

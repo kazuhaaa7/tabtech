@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabungan Sederhana</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #3a7bd5, #00d2ff);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.8rem;
+            font-weight: 700;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 1.1rem;
+            max-width: 80%;
+            margin: 0 auto;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            background: linear-gradient(90deg, #2c3e50, #4a6491);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            position: relative;
+        }
+
+        .card-header::before, .card-header::after {
+            content: "---";
+            position: absolute;
+            color: #00d2ff;
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+        }
+
+        .card-header::before {
+            left: 20px;
+        }
+
+        .card-header::after {
+            right: 20px;
+        }
+
+        .menu {
+            padding: 30px 40px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 20px 25px;
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .menu-item:hover {
+            background-color: #e9f7fe;
+            border-color: #3a7bd5;
+            transform: translateX(5px);
+        }
+
+        .menu-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .menu-number {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+            color: white;
+            border-radius: 50%;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .menu-content {
+            flex-grow: 1;
+        }
+
+        .menu-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .menu-desc {
+            font-size: 0.95rem;
+            color: #7f8c8d;
+        }
+
+        .menu-icon {
+            color: #3a7bd5;
+            font-size: 1.5rem;
+        }
+
+        .input-section {
+            padding: 30px 40px;
+            border-top: 1px solid #eee;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .input-label {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .input-container {
+            display: flex;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .input-field {
+            flex-grow: 1;
+            padding: 15px 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px 0 0 10px;
+            font-size: 1.1rem;
+            font-family: 'Roboto Mono', monospace;
+            transition: all 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #3a7bd5;
+        }
+
+        .input-btn {
+            background: linear-gradient(135deg, #3a7bd5, #2c3e50);
+            color: white;
+            border: none;
+            border-radius: 0 10px 10px 0;
+            padding: 0 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .input-btn:hover {
+            background: linear-gradient(135deg, #2c3e50, #3a7bd5);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                max-width: 95%;
+            }
+            
+            .card-header {
+                font-size: 1.2rem;
+                padding: 20px;
+            }
+            
+            .menu {
+                padding: 20px;
+            }
+            
+            .menu-item {
+                padding: 15px 20px;
+            }
+            
+            .input-section {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Tabungan Sederhana</h1>
+            <p>Kelola keuangan Anda dengan mudah dan efisien</p>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                TABUNGAN SEDERHANA
+            </div>
+            
+            <div class="menu">
+                <div class="menu-item" id="menu1">
+                    <div class="menu-number">1</div>
+                    <div class="menu-content">
+                        <div class="menu-title">Login</div>
+                        <div class="menu-desc">Masuk ke akun Anda yang sudah terdaftar</div>
+                    </div>
+                    <div class="menu-icon">
+                        <i class="fas fa-sign-in-alt"></i>
+                    </div>
+                </div>
+                
+                <div class="menu-item" id="menu2">
+                    <div class="menu-number">2</div>
+                    <div class="menu-content">
+                        <div class="menu-title">Registrasi</div>
+                        <div class="menu-desc">Buat akun baru untuk mulai menabung</div>
+                    </div>
+                    <div class="menu-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                </div>
+                
+                <div class="menu-item" id="menu3">
+                    <div class="menu-number">3</div>
+                    <div class="menu-content">
+                        <div class="menu-title">Keluar</div>
+                        <div class="menu-desc">Keluar dari aplikasi Tabungan Sederhana</div>
+                    </div>
+                    <div class="menu-icon">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="input-section">
+                <div class="input-label">Pilih menu (1-3):</div>
+                <div class="input-container">
+                    <input type="text" class="input-field" id="menuInput" placeholder="Masukkan pilihan" maxlength="1">
+                    <button class="input-btn" id="submitBtn">PILIH</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; 2023 Tabungan Sederhana. Semua hak dilindungi.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuItems = document.querySelectorAll('.menu-item');
+            const menuInput = document.getElementById('menuInput');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // Efek klik pada menu item
+            menuItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const menuNumber = this.querySelector('.menu-number').textContent;
+                    menuInput.value = menuNumber;
+                    processMenuSelection(menuNumber);
+                });
+            });
+            
+            // Efek hover pada menu item
+            menuItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    const menuNumber = this.querySelector('.menu-number').textContent;
+                    menuInput.value = menuNumber;
+                });
+            });
+            
+            // Tombol submit
+            submitBtn.addEventListener('click', function() {
+                const selectedMenu = menuInput.value.trim();
+                processMenuSelection(selectedMenu);
+            });
+            
+            // Input field enter key
+            menuInput.addEventListener('keyup', function(event) {
+                if (event.key === 'Enter') {
+                    const selectedMenu = menuInput.value.trim();
+                    processMenuSelection(selectedMenu);
+                }
+            });
+            
+            // Fungsi untuk memproses pilihan menu
+            function processMenuSelection(menuNumber) {
+                // Reset semua item menu
+                menuItems.forEach(item => {
+                    item.style.backgroundColor = '#f8f9fa';
+                    item.style.borderColor = 'transparent';
+                });
+                
+                // Validasi input
+                if (!menuNumber || menuNumber < 1 || menuNumber > 3) {
+                    alert('Masukkan pilihan yang valid (1-3)');
+                    menuInput.focus();
+                    return;
+                }
+                
+                // Highlight menu yang dipilih
+                const selectedItem = document.getElementById(`menu${menuNumber}`);
+                selectedItem.style.backgroundColor = '#e1f5fe';
+                selectedItem.style.borderColor = '#3a7bd5';
+                
+                // Animasi konfirmasi
+                selectedItem.style.transform = 'scale(1.02)';
+                setTimeout(() => {
+                    selectedItem.style.transform = 'scale(1)';
+                }, 200);
+                
+                // Tampilkan pesan berdasarkan pilihan
+                let message = '';
+                switch(menuNumber) {
+                    case '1':
+                        message = 'Anda memilih Login. Mengarahkan ke halaman login...';
+                        break;
+                    case '2':
+                        message = 'Anda memilih Registrasi. Mengarahkan ke halaman pendaftaran...';
+                        break;
+                    case '3':
+                        message = 'Anda memilih Keluar. Mengucapkan selamat tinggal...';
+                        break;
+                }
+                
+                // Tampilkan alert
+                setTimeout(() => {
+                    alert(message);
+                    
+                    // Reset input setelah dipilih
+                    menuInput.value = '';
+                    
+                    // Reset highlight setelah beberapa detik
+                    setTimeout(() => {
+                        selectedItem.style.backgroundColor = '#f8f9fa';
+                        selectedItem.style.borderColor = 'transparent';
+                    }, 1000);
+                }, 300);
+            }
+            
+            // Fokus ke input field saat halaman dimuat
+            menuInput.focus();
+        });
+    </script>
+</body>
+</html>
