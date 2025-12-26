@@ -107,6 +107,8 @@
             cursor: pointer;
             transition: all 0.3s ease;
             border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
         }
 
         .menu-item:hover {
@@ -298,6 +300,15 @@
                     <button class="input-btn" id="submitBtn">PILIH</button>
                 </div>
             </div>
+
+            <!-- <div class="navigation">
+                <button class="nav-btn" onclick="goToHome()">
+                    <i class="fas fa-home"></i> Halaman Utama
+                </button>
+                <button class="nav-btn nav-btn-primary" onclick="showHelp()">
+                    <i class="fas fa-question-circle"></i> Butuh Bantuan?
+                </button>
+            </div> -->
         </div>
         
         <div class="footer">
@@ -372,6 +383,7 @@
                 let message = '';
                 switch(menuNumber) {
                     case '1':
+                        // window.location.href = 'index.html';
                         message = 'Anda memilih Login. Mengarahkan ke halaman login...';
                         break;
                     case '2':

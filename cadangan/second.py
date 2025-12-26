@@ -9,6 +9,7 @@ app = Flask(__name__) # bawaan flask
 # home page
 @app.route('/') # -> bawaan flask 
 def home():
+    """menampilkan home page"""
     return render_template('home.html')
 
 # contact page

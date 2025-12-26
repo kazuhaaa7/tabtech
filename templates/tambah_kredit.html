@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Kredit - Tabungan Sederhana</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #3a7bd5, #00d2ff);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header & Navigation */
+        .navbar {
+            background: linear-gradient(90deg, #2c3e50, #4a6491);
+            color: white;
+            padding: 1.5rem 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: white;
+        }
+
+        .logo i {
+            color: #00d2ff;
+            font-size: 2rem;
+        }
+
+        .page-title {
+            text-align: center;
+            flex-grow: 1;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #e74c3c, #f39c12);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Warning Banner */
+        .warning-banner {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
+            animation: pulseWarning 2s infinite;
+        }
+
+        @keyframes pulseWarning {
+            0% { opacity: 0.9; }
+            50% { opacity: 1; }
+            100% { opacity: 0.9; }
+        }
+
+        .warning-banner i {
+            font-size: 1.5rem;
+        }
+
+        .warning-text {
+            flex-grow: 1;
+            font-weight: 500;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1200px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Form Card */
+        .form-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #e74c3c, #f39c12);
+        }
+
+        .form-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .form-title i {
+            color: #e74c3c;
+        }
+
+        .form-subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .saldo-info {
+            background: linear-gradient(135deg, #fef5e7, #fdebd0);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 4px solid #e74c3c;
+            position: relative;
+        }
+
+        .saldo-label {
+            font-size: 1rem;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+
+        .saldo-amount {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .saldo-warning {
+            margin-top: 15px;
+            padding: 10px 15px;
+            background: #fadbd8;
+            color: #c0392b;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 3px solid #e74c3c;
+        }
+
+        .saldo-warning i {
+            color: #e74c3c;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 500;
+            color: #2c3e50;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-label i {
+            color: #e74c3c;
+            width: 20px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 18px 20px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #e74c3c;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        }
+
+        .form-input.error {
+            border-color: #e74c3c;
+            background: #fadbd8;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .form-hint {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-hint i {
+            color: #f39c12;
+        }
+
+        .max-withdraw {
+            margin-top: 15px;
+            padding: 12px;
+            background: #e8f4fc;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .max-withdraw i {
+            color: #3498db;
+            font-size: 1.2rem;
+        }
+
+        .max-amount {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        /* Verification Section */
+        .verification-section {
+            background: #fef5e7;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border: 2px dashed #e74c3c;
+            display: none;
+        }
+
+        .verification-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .verification-amount {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #e74c3c;
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #e74c3c;
+        }
+
+        .new-balance-preview {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        .new-balance-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .new-balance-amount {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .verification-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .verification-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 150px;
+            justify-content: center;
+        }
+
+        .btn-confirm {
+            background: linear-gradient(135deg, #e74c3c, #f39c12);
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background: linear-gradient(135deg, #c0392b, #e67e22);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-cancel {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: linear-gradient(135deg, #7f8c8d, #6c7a7d);
+            transform: translateY(-2px);
+        }
+
+        /* Table Card */
+        .table-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .table-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #3498db, #2980b9);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .table-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .table-title i {
+            color: #3498db;
+        }
+
+        .refresh-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .refresh-btn:hover {
+            background: linear-gradient(135deg, #2980b9, #1c5a7d);
+            transform: translateY(-2px);
+        }
+
+        /* Table Styling */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #eee;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .data-table thead {
+            background: linear-gradient(90deg, #2c3e50, #4a6491);
+            color: white;
+        }
+
+        .data-table th {
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.95rem;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .data-table th:last-child {
+            border-right: none;
+        }
+
+        .data-table tbody tr {
+            border-bottom: 1px solid #eee;
+            transition: background 0.3s;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .data-table td {
+            padding: 16px 15px;
+            color: #2c3e50;
+        }
+
+        .data-table .no-cell {
+            font-weight: 600;
+            color: #3a7bd5;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .data-table .date-cell {
+            font-family: 'Roboto Mono', monospace;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .data-table .debit-cell {
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        .data-table .credit-cell {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        .data-table .balance-cell {
+            color: #2c3e50;
+            font-weight: 700;
+        }
+
+        .data-table .info-cell {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .data-table .user-cell {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .empty-table {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+
+        .empty-table i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #bdc3c7;
+        }
+
+        .empty-table p {
+            font-size: 1.2rem;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px 30px;
+            background: white;
+            color: #2c3e50;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 1001;
+            animation: slideInRight 0.5s ease;
+            border-left: 5px solid #27ae60;
+            max-width: 400px;
+        }
+
+        .notification.error {
+            border-left-color: #e74c3c;
+        }
+
+        .notification.warning {
+            border-left-color: #f39c12;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .notification-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .notification-icon {
+            font-size: 1.8rem;
+        }
+
+        .notification.success .notification-icon {
+            color: #27ae60;
+        }
+
+        .notification.error .notification-icon {
+            color: #e74c3c;
+        }
+
+        .notification.warning .notification-icon {
+            color: #f39c12;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .notification-message {
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f8f9fa;
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .modal-title i {
+            color: #e74c3c;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #7f8c8d;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .close-modal:hover {
+            background: #f8f9fa;
+            color: #2c3e50;
+        }
+
+        /* Insufficient Balance Warning */
+        .insufficient-warning {
+            background: #fadbd8;
+            color: #c0392b;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+            align-items: center;
+            gap: 15px;
+            border-left: 4px solid #e74c3c;
+            animation: shake 0.5s;
+        }
+
+        .insufficient-warning i {
+            font-size: 1.5rem;
+        }
+
+        /* Loader */
+        .loader {
+            display: none;
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #e74c3c;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 30px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+                padding: 20px;
+            }
+
+            .nav-buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .warning-banner {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+
+            .form-card,
+            .table-card {
+                padding: 25px;
+            }
+
+            .form-title,
+            .table-title {
+                font-size: 1.5rem;
+            }
+
+            .verification-buttons {
+                flex-direction: column;
+            }
+
+            .verification-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <div class="notification-header">
+            <i class="fas fa-check-circle notification-icon"></i>
+            <div class="notification-title">Berhasil!</div>
+        </div>
+        <div class="notification-message" id="notificationMessage"></div>
+    </div>
+
+    <!-- Keterangan Modal -->
+    <div class="modal" id="keteranganModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-info-circle"></i>
+                    Keterangan Penggunaan Kredit
+                </div>
+                <button class="close-modal" onclick="closeModal('keteranganModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-sticky-note"></i> Masukkan kepentingan Anda
+                </label>
+                <textarea 
+                    class="form-input" 
+                    id="keteranganInput" 
+                    placeholder="Contoh: Bayar tagihan listrik, Belanja bulanan, Dana darurat, dll."
+                    rows="4"
+                    style="resize: vertical; min-height: 100px;"
+                ></textarea>
+                <div class="form-hint">
+                    <i class="fas fa-exclamation-circle"></i>
+                    Form keterangan tidak boleh kosong
+                </div>
+            </div>
+            <div style="display: flex; gap: 15px; margin-top: 30px;">
+                <button class="btn btn-secondary" onclick="closeModal('keteranganModal')" style="flex: 1; padding: 15px; background: #95a5a6; color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                    Batal
+                </button>
+                <button class="btn btn-primary" onclick="konfirmasiKeterangan()" style="flex: 1; padding: 15px; background: linear-gradient(135deg, #e74c3c, #f39c12); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                    Simpan & Proses
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Warning Banner -->
+        <div class="warning-banner">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div class="warning-text">
+                PERHATIAN: Penambahan kredit akan mengurangi saldo Anda. Pastikan saldo mencukupi sebelum melakukan transaksi.
+            </div>
+        </div>
+
+        <!-- Navbar -->
+        <nav class="navbar">
+            <a href="/menu_user" class="logo">
+                <i class="fas fa-piggy-bank"></i>
+                <span>Tabungan Sederhana</span>
+            </a>
+            <div class="page-title">HALAMAN TABUNGAN - TAMBAH KREDIT</div>
+            <div class="user-info">
+                <div class="nav-buttons">
+                    <button class="nav-btn" onclick="goBack()">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </button>
+                    <button class="nav-btn" onclick="refreshPage()">
+                        <i class="fas fa-redo"></i> Refresh
+                    </button>
+                </div>
+                <div class="user-avatar" id="userAvatar">U</div>
+            </div>
+        </nav>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Left: Form Tambah Kredit -->
+            <div class="form-card">
+                <div class="form-title">
+                    <i class="fas fa-credit-card"></i>
+                    Tambah Kredit
+                </div>
+                
+                <div class="form-subtitle">
+                    Tambahkan kredit (pengeluaran) dari akun tabungan Anda. Transaksi ini akan mengurangi saldo.
+                </div>
+                
+                <!-- Saldo Terakhir -->
+                <div class="saldo-info">
+                    <div class="saldo-label">Saldo Anda Saat Ini</div>
+                    <div class="saldo-amount">Rp <span id="currentBalance">1.500.000</span></div>
+                    
+                    <div class="saldo-warning">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Pastikan saldo cukup sebelum menambah kredit
+                    </div>
+                </div>
+                
+                <!-- Insufficient Balance Warning -->
+                <div class="insufficient-warning" id="insufficientWarning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>Saldo Tidak Cukup!</strong><br>
+                        Jumlah kredit melebihi saldo Anda. Silakan kurangi jumlah kredit.
+                    </div>
+                </div>
+                
+                <!-- Form Input -->
+                <form id="tambahKreditForm">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-money-bill-wave"></i> Jumlah Kredit
+                        </label>
+                        <input 
+                            type="text" 
+                            class="form-input" 
+                            id="jumlahKredit" 
+                            placeholder="Masukkan kredit yang ingin ditambahkan"
+                            autocomplete="off"
+                        >
+                        <div class="form-hint">
+                            <i class="fas fa-exclamation-circle"></i>
+                            Input harus angka dan lebih dari 0
+                        </div>
+                        
+                        <div class="max-withdraw">
+                            <i class="fas fa-wallet"></i>
+                            <div>Maksimum yang dapat ditarik: <span class="max-amount" id="maxAmount">Rp 1.500.000</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions" style="margin-top: 30px;">
+                        <button type="submit" class="verification-btn btn-confirm" style="width: 100%;">
+                            <i class="fas fa-calculator"></i> Verifikasi Penambahan Kredit
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Verification Section -->
+                <div class="verification-section" id="verificationSection">
+                    <div class="verification-title">
+                        <i class="fas fa-check-circle"></i>
+                        Konfirmasi Penambahan Kredit
+                    </div>
+                    
+                    <div class="verification-amount" id="verificationAmount">
+                        Rp 0
+                    </div>
+                    
+                    <div class="new-balance-preview">
+                        <div class="new-balance-label">Saldo Setelah Transaksi:</div>
+                        <div class="new-balance-amount" id="newBalanceAmount">Rp 1.500.000</div>
+                    </div>
+                    
+                    <div style="text-align: center; color: #7f8c8d; margin-bottom: 20px;">
+                        Anda yakin ingin menambah kredit sebesar ini?
+                    </div>
+                    
+                    <div class="verification-buttons">
+                        <button class="verification-btn btn-confirm" onclick="konfirmasiPenambahan()">
+                            <i class="fas fa-check"></i> Ya, Tambah
+                        </button>
+                        <button class="verification-btn btn-cancel" onclick="batalPenambahan()">
+                            <i class="fas fa-times"></i> Batal
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Loader -->
+                <div class="loader" id="formLoader"></div>
+            </div>
+            
+            <!-- Right: Tabel Riwayat -->
+            <div class="table-card">
+                <div class="table-header">
+                    <div class="table-title">
+                        <i class="fas fa-history"></i>
+                        Riwayat Tabungan
+                    </div>
+                    <button class="refresh-btn" onclick="loadTableData()">
+                        <i class="fas fa-sync-alt"></i> Refresh Data
+                    </button>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="riwayatTable">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Tanggal</th>
+                                <th>Debet</th>
+                                <th>Kredit</th>
+                                <th>Saldo</th>
+                                <th>Keterangan</th>
+                                <th>Username</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Data akan diisi oleh JavaScript -->
+                        </tbody>
+                    </table>
+                    
+                    <div class="empty-table" id="emptyTable">
+                        <i class="fas fa-inbox"></i>
+                        <p>Belum ada transaksi</p>
+                    </div>
+                </div>
+                
+                <!-- Loader untuk tabel -->
+                <div class="loader" id="tableLoader"></div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; 2024 Tabungan Sederhana. Halaman Tambah Kredit.</p>
+        </div>
+    </div>
+
+    <script>
+        // Get username from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get('username') || 'Pengguna';
+        let currentBalance = 1500000; // Default saldo
+        let pendingAmount = 0;
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set user data
+            document.getElementById('userAvatar').textContent = username.charAt(0).toUpperCase();
+            
+            // Update max amount display
+            document.getElementById('maxAmount').textContent = `Rp ${currentBalance.toLocaleString()}`;
+            
+            // Load table data
+            loadTableData();
+            
+            // Focus on input field
+            document.getElementById('jumlahKredit').focus();
+            
+            // Add real-time validation for kredit input
+            document.getElementById('jumlahKredit').addEventListener('input', function() {
+                validateKreditInput();
+            });
+        });
+        
+        // Validate kredit input in real-time
+        function validateKreditInput() {
+            const jumlahInput = document.getElementById('jumlahKredit').value.trim();
+            const insufficientWarning = document.getElementById('insufficientWarning');
+            
+            // Hide warning by default
+            insufficientWarning.style.display = 'none';
+            
+            if (!jumlahInput) return;
+            
+            // Check if it's a valid number
+            if (!/^\d+$/.test(jumlahInput)) return;
+            
+            const jumlah = parseInt(jumlahInput);
+            
+            // Check if amount exceeds balance
+            if (jumlah > currentBalance) {
+                insufficientWarning.style.display = 'flex';
+            }
+        }
+        
+        // Load table data
+        function loadTableData() {
+            const tableLoader = document.getElementById('tableLoader');
+            const tableBody = document.getElementById('tableBody');
+            const emptyTable = document.getElementById('emptyTable');
+            
+            tableLoader.style.display = 'block';
+            emptyTable.style.display = 'none';
+            tableBody.innerHTML = '';
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Mock data - in real app, fetch from API
+                const mockData = [
+                    { no: 1, datee: '2024-01-15', debit: 500000, credit: 0, balance: 500000, information: 'Gaji bulanan', username: username },
+                    { no: 2, datee: '2024-01-20', debit: 0, credit: 200000, balance: 300000, information: 'Bayar listrik', username: username },
+                    { no: 3, datee: '2024-02-01', debit: 1000000, credit: 0, balance: 1300000, information: 'Bonus tahunan', username: username },
+                    { no: 4, datee: '2024-02-10', debit: 0, credit: 500000, balance: 800000, information: 'Belanja kebutuhan', username: username },
+                    { no: 5, datee: '2024-02-15', debit: 700000, credit: 0, balance: 1500000, information: 'Gaji bulan Februari', username: username }
+                ];
+                
+                if (mockData.length === 0) {
+                    emptyTable.style.display = 'block';
+                } else {
+                    // Update current balance from last transaction
+                    currentBalance = mockData[mockData.length - 1].balance;
+                    document.getElementById('currentBalance').textContent = currentBalance.toLocaleString();
+                    document.getElementById('maxAmount').textContent = `Rp ${currentBalance.toLocaleString()}`;
+                    
+                    // Populate table
+                    mockData.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="no-cell">${row.no}</td>
+                            <td class="date-cell">${row.datee}</td>
+                            <td class="debit-cell">${row.debit > 0 ? `Rp ${row.debit.toLocaleString()}` : '-'}</td>
+                            <td class="credit-cell">${row.credit > 0 ? `Rp ${row.credit.toLocaleString()}` : '-'}</td>
+                            <td class="balance-cell">Rp ${row.balance.toLocaleString()}</td>
+                            <td class="info-cell" title="${row.information}">${row.information}</td>
+                            <td class="user-cell">${row.username}</td>
+                        `;
+                        tableBody.appendChild(tr);
+                    });
+                }
+                
+                tableLoader.style.display = 'none';
+            }, 1000);
+        }
+        
+        // Form submission
+        document.getElementById('tambahKreditForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const jumlahInput = document.getElementById('jumlahKredit').value.trim();
+            const jumlahKredit = document.getElementById('jumlahKredit');
+            const insufficientWarning = document.getElementById('insufficientWarning');
+            
+            // Hide insufficient warning initially
+            insufficientWarning.style.display = 'none';
+            
+            // Validation
+            if (!jumlahInput) {
+                showNotification('Form kredit tidak boleh kosong!', 'error');
+                jumlahKredit.classList.add('error');
+                setTimeout(() => jumlahKredit.classList.remove('error'), 1000);
+                return;
+            }
+            
+            // Check if it's a valid number
+            if (!/^\d+$/.test(jumlahInput)) {
+                showNotification('Input harus angka!', 'error');
+                jumlahKredit.classList.add('error');
+                setTimeout(() => jumlahKredit.classList.remove('error'), 1000);
+                return;
+            }
+            
+            const jumlah = parseInt(jumlahInput);
+            
+            if (jumlah <= 0) {
+                showNotification('Nominal harus lebih dari 0!', 'error');
+                jumlahKredit.classList.add('error');
+                setTimeout(() => jumlahKredit.classList.remove('error'), 1000);
+                return;
+            }
+            
+            // Check if amount exceeds balance
+            if (jumlah > currentBalance) {
+                insufficientWarning.style.display = 'flex';
+                showNotification('Jumlah kredit melebihi saldo Anda!', 'error');
+                jumlahKredit.classList.add('error');
+                setTimeout(() => jumlahKredit.classList.remove('error'), 1000);
+                return;
+            }
+            
+            // Show verification section
+            pendingAmount = jumlah;
+            const newBalance = currentBalance - jumlah;
+            
+            document.getElementById('verificationAmount').textContent = `Rp ${jumlah.toLocaleString()}`;
+            document.getElementById('newBalanceAmount').textContent = `Rp ${newBalance.toLocaleString()}`;
+            document.getElementById('verificationSection').style.display = 'block';
+            
+            // Scroll to verification
+            document.getElementById('verificationSection').scrollIntoView({ behavior: 'smooth' });
+        });
+        
+        // Confirm addition
+        function konfirmasiPenambahan() {
+            // Show keterangan modal
+            openModal('keteranganModal');
+        }
+        
+        // Cancel addition
+        function batalPenambahan() {
+            document.getElementById('verificationSection').style.display = 'none';
+            document.getElementById('jumlahKredit').value = '';
+            document.getElementById('jumlahKredit').focus();
+            showNotification('Penambahan kredit dibatalkan', 'warning');
+        }
+        
+        // Confirm keterangan
+        function konfirmasiKeterangan() {
+            const keterangan = document.getElementById('keteranganInput').value.trim();
+            
+            if (!keterangan) {
+                showNotification('Form keterangan tidak boleh kosong!', 'error');
+                return;
+            }
+            
+            closeModal('keteranganModal');
+            
+            // Show loader
+            const formLoader = document.getElementById('formLoader');
+            formLoader.style.display = 'block';
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Calculate new balance
+                const newBalance = currentBalance - pendingAmount;
+                
+                // Add to table (in real app, this would be via API)
+                const tableBody = document.getElementById('tableBody');
+                const newRow = document.createElement('tr');
+                const newNo = tableBody.children.length + 1;
+                const today = new Date().toISOString().split('T')[0];
+                
+                newRow.innerHTML = `
+                    <td class="no-cell">${newNo}</td>
+                    <td class="date-cell">${today}</td>
+                    <td class="debit-cell">-</td>
+                    <td class="credit-cell">Rp ${pendingAmount.toLocaleString()}</td>
+                    <td class="balance-cell">Rp ${newBalance.toLocaleString()}</td>
+                    <td class="info-cell" title="${keterangan}">${keterangan}</td>
+                    <td class="user-cell">${username}</td>
+                `;
+                
+                // Insert at the top
+                if (tableBody.firstChild) {
+                    tableBody.insertBefore(newRow, tableBody.firstChild);
+                } else {
+                    tableBody.appendChild(newRow);
+                    document.getElementById('emptyTable').style.display = 'none';
+                }
+                
+                // Update current balance display
+                currentBalance = newBalance;
+                document.getElementById('currentBalance').textContent = currentBalance.toLocaleString();
+                document.getElementById('maxAmount').textContent = `Rp ${currentBalance.toLocaleString()}`;
+                
+                // Reset form
+                document.getElementById('verificationSection').style.display = 'none';
+                document.getElementById('jumlahKredit').value = '';
+                document.getElementById('keteranganInput').value = '';
+                document.getElementById('jumlahKredit').focus();
+                
+                // Show success message
+                showNotification(`User ${username} berhasil menambahkan kredit sebesar Rp ${pendingAmount.toLocaleString()}!`, 'success');
+                
+                // Hide loader
+                formLoader.style.display = 'none';
+                
+            }, 1500);
+        }
+        
+        // Modal functions
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            
+            // Focus on input in modal
+            if (modalId === 'keteranganModal') {
+                setTimeout(() => {
+                    document.getElementById('keteranganInput').focus();
+                }, 300);
+            }
+        }
+        
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationMessage = document.getElementById('notificationMessage');
+            
+            notificationMessage.textContent = message;
+            notification.className = `notification ${type}`;
+            
+            const icon = notification.querySelector('.notification-icon');
+            if (type === 'success') {
+                icon.className = 'fas fa-check-circle notification-icon';
+            } else if (type === 'error') {
+                icon.className = 'fas fa-exclamation-circle notification-icon';
+            } else {
+                icon.className = 'fas fa-exclamation-triangle notification-icon';
+            }
+            
+            notification.style.display = 'block';
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Navigation functions
+        function goBack() {
+            window.location.href = `/menu_user?username=${encodeURIComponent(username)}`;
+        }
+        
+        function refreshPage() {
+            loadTableData();
+            showNotification('Data diperbarui', 'success');
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Escape key to close modals
+            if (e.key === 'Escape') {
+                const modals = document.querySelectorAll('.modal');
+                modals.forEach(modal => {
+                    if (modal.style.display === 'flex') {
+                        const modalId = modal.id;
+                        closeModal(modalId);
+                    }
+                });
+                
+                // Also hide verification section
+                if (document.getElementById('verificationSection').style.display === 'block') {
+                    batalPenambahan();
+                }
+            }
+            
+            // Enter key in jumlah kredit field
+            if (e.key === 'Enter' && document.activeElement.id === 'jumlahKredit') {
+                document.getElementById('tambahKreditForm').dispatchEvent(new Event('submit'));
+            }
+        });
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    const modalId = modal.id;
+                    closeModal(modalId);
+                }
+            });
+        };
+    </script>
+</body>
+</html>

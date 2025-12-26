@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Riwayat Tabungan - Tabungan Sederhana</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #3a7bd5, #00d2ff);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header & Navigation */
+        .navbar {
+            background: linear-gradient(90deg, #2c3e50, #4a6491);
+            color: white;
+            padding: 1.5rem 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: white;
+        }
+
+        .logo i {
+            color: #00d2ff;
+            font-size: 2rem;
+        }
+
+        .page-title {
+            text-align: center;
+            flex-grow: 1;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Stats Cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+        }
+
+        .stat-card.total-saldo::before {
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+        }
+
+        .stat-card.total-masuk::before {
+            background: linear-gradient(90deg, #3498db, #2980b9);
+        }
+
+        .stat-card.total-keluar::before {
+            background: linear-gradient(90deg, #e74c3c, #f39c12);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .total-saldo .stat-icon {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+        }
+
+        .total-masuk .stat-icon {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+
+        .total-keluar .stat-icon {
+            background: linear-gradient(135deg, #e74c3c, #f39c12);
+        }
+
+        .stat-title {
+            font-size: 1rem;
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+
+        .stat-subtitle {
+            font-size: 0.9rem;
+            color: #bdc3c7;
+        }
+
+        .stat-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .stat-trend {
+            font-size: 0.9rem;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .trend-up {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+        }
+
+        .trend-down {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        /* Main Content */
+        .main-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #9b59b6, #8e44ad);
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .content-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .content-title i {
+            color: #9b59b6;
+        }
+
+        .content-subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+
+        .table-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-select {
+            padding: 10px 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #9b59b6;
+            background: white;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            padding: 10px 20px 10px 45px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            width: 250px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #9b59b6;
+            box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+        }
+
+        .export-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .export-btn:hover {
+            background: linear-gradient(135deg, #219653, #27ae60);
+            transform: translateY(-2px);
+        }
+
+        /* Table Container */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 15px;
+            border: 1px solid #eee;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-top: 20px;
+            position: relative;
+        }
+
+        /* Fancy Table Styling */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+
+        .data-table thead {
+            background: linear-gradient(90deg, #2c3e50, #4a6491);
+        }
+
+        .data-table thead tr {
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .data-table th {
+            padding: 20px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1rem;
+            color: white;
+            position: relative;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .data-table th:last-child {
+            border-right: none;
+        }
+
+        .data-table th::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+        }
+
+        .data-table tbody tr {
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8f9fa;
+            transform: scale(1.002);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .data-table tbody tr:last-child {
+            border-bottom: 2px solid #9b59b6;
+        }
+
+        .data-table td {
+            padding: 18px 15px;
+            color: #2c3e50;
+            position: relative;
+        }
+
+        .data-table td::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: transparent;
+            transition: background 0.3s;
+        }
+
+        .data-table tr:hover td::before {
+            background: linear-gradient(to bottom, #9b59b6, #8e44ad);
+        }
+
+        .data-table .no-cell {
+            font-weight: 700;
+            color: #3a7bd5;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.1rem;
+            text-align: center;
+            width: 70px;
+        }
+
+        .data-table .date-cell {
+            font-family: 'Roboto Mono', monospace;
+            color: #7f8c8d;
+            font-size: 0.95rem;
+            width: 120px;
+        }
+
+        .data-table .debit-cell {
+            color: #27ae60;
+            font-weight: 700;
+            font-size: 1.1rem;
+            width: 150px;
+        }
+
+        .data-table .credit-cell {
+            color: #e74c3c;
+            font-weight: 700;
+            font-size: 1.1rem;
+            width: 150px;
+        }
+
+        .data-table .balance-cell {
+            color: #2c3e50;
+            font-weight: 800;
+            font-size: 1.2rem;
+            width: 180px;
+        }
+
+        .data-table .balance-cell::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 70%;
+            background: linear-gradient(to bottom, #27ae60, #3498db);
+            border-radius: 3px;
+        }
+
+        .data-table .info-cell {
+            max-width: 250px;
+            min-width: 200px;
+        }
+
+        .info-content {
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 3px solid #9b59b6;
+            line-height: 1.4;
+        }
+
+        .data-table .user-cell {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            width: 120px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .badge-debit {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+        }
+
+        .badge-credit {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #7f8c8d;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #bdc3c7;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #95a5a6;
+        }
+
+        .empty-message {
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto 30px;
+            line-height: 1.5;
+        }
+
+        .empty-action {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .empty-action:hover {
+            background: linear-gradient(135deg, #2980b9, #1c5a7d);
+            transform: translateY(-2px);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 30px;
+            padding: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .pagination-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: white;
+            color: #2c3e50;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pagination-btn:hover {
+            border-color: #9b59b6;
+            color: #9b59b6;
+            transform: translateY(-2px);
+        }
+
+        .pagination-btn.active {
+            background: #9b59b6;
+            color: white;
+            border-color: #9b59b6;
+        }
+
+        .pagination-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-btn.disabled:hover {
+            transform: none;
+            border-color: #ddd;
+            color: #2c3e50;
+        }
+
+        .page-info {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        /* Summary Section */
+        .summary-section {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 40px;
+            border-left: 5px solid #9b59b6;
+        }
+
+        .summary-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .summary-title i {
+            color: #9b59b6;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .summary-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .summary-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        /* Loader */
+        .loader {
+            display: none;
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #9b59b6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 40px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .stats-container {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+                padding: 20px;
+            }
+
+            .nav-buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .content-header {
+                flex-direction: column;
+                gap: 20px;
+                align-items: stretch;
+            }
+
+            .table-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .stat-amount {
+                font-size: 2rem;
+            }
+
+            .data-table {
+                min-width: 1000px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <a href="/menu_user" class="logo">
+                <i class="fas fa-piggy-bank"></i>
+                <span>Tabungan Sederhana</span>
+            </a>
+            <div class="page-title">DAFTAR RIWAYAT TABUNGAN</div>
+            <div class="user-info">
+                <div class="nav-buttons">
+                    <button class="nav-btn" onclick="goBack()">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </button>
+                    <button class="nav-btn" onclick="refreshData()">
+                        <i class="fas fa-redo"></i> Refresh
+                    </button>
+                </div>
+                <div class="user-avatar" id="userAvatar">U</div>
+            </div>
+        </nav>
+
+        <!-- Stats Cards -->
+        <div class="stats-container">
+            <!-- Total Saldo -->
+            <div class="stat-card total-saldo">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Total Saldo</div>
+                        <div class="stat-subtitle">Saldo Akhir</div>
+                    </div>
+                </div>
+                <div class="stat-amount" id="totalSaldo">Rp 1.500.000</div>
+                <div class="stat-trend trend-up">
+                    <i class="fas fa-arrow-up"></i>
+                    Stabil
+                </div>
+            </div>
+
+            <!-- Total Uang Masuk -->
+            <div class="stat-card total-masuk">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Total Uang Masuk</div>
+                        <div class="stat-subtitle">Semua Debet</div>
+                    </div>
+                </div>
+                <div class="stat-amount" id="totalMasuk">Rp 2.200.000</div>
+                <div class="stat-trend trend-up">
+                    <i class="fas fa-arrow-up"></i>
+                    Positif
+                </div>
+            </div>
+
+            <!-- Total Uang Keluar -->
+            <div class="stat-card total-keluar">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Total Uang Keluar</div>
+                        <div class="stat-subtitle">Semua Kredit</div>
+                    </div>
+                </div>
+                <div class="stat-amount" id="totalKeluar">Rp 700.000</div>
+                <div class="stat-trend trend-down">
+                    <i class="fas fa-arrow-down"></i>
+                    Terkendali
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-header">
+                <div>
+                    <div class="content-title">
+                        <i class="fas fa-history"></i>
+                        Riwayat Tabungan Lengkap
+                    </div>
+                    <div class="content-subtitle">
+                        Semua transaksi tabungan Anda dalam satu tampilan
+                    </div>
+                </div>
+                <div class="table-controls">
+                    <select class="filter-select" id="filterType">
+                        <option value="all">Semua Transaksi</option>
+                        <option value="debit">Uang Masuk</option>
+                        <option value="credit">Uang Keluar</option>
+                        <option value="this-month">Bulan Ini</option>
+                        <option value="last-month">Bulan Lalu</option>
+                    </select>
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" id="searchInput" placeholder="Cari transaksi...">
+                    </div>
+                    <button class="export-btn" onclick="exportData()">
+                        <i class="fas fa-file-export"></i>
+                        Ekspor
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table Container -->
+            <div class="table-container">
+                <table class="data-table" id="riwayatTable">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Tanggal</th>
+                            <th>Debet</th>
+                            <th>Kredit</th>
+                            <th>Saldo</th>
+                            <th>Keterangan</th>
+                            <th>Username</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Data akan diisi oleh JavaScript -->
+                    </tbody>
+                </table>
+
+                <!-- Empty State -->
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                    <div class="empty-title">Belum ada transaksi</div>
+                    <div class="empty-message">
+                        Mulailah menabung dengan melakukan transaksi pertama Anda. 
+                        Riwayat tabungan akan muncul di sini.
+                    </div>
+                    <button class="empty-action" onclick="goToAddSaldo()">
+                        <i class="fas fa-plus-circle"></i>
+                        Tambah Saldo Pertama
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loader -->
+            <div class="loader" id="tableLoader"></div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="pagination">
+                <button class="pagination-btn" onclick="changePage(-1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <span class="page-info" id="pageInfo">Halaman 1 dari 3</span>
+                <button class="pagination-btn" onclick="changePage(1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- Summary Section -->
+            <div class="summary-section">
+                <div class="summary-title">
+                    <i class="fas fa-chart-pie"></i>
+                    Rangkuman Tabungan
+                </div>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="summary-label">Total Transaksi</div>
+                        <div class="summary-value" id="totalTransaksi">5</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Rata-rata Debet</div>
+                        <div class="summary-value" id="avgDebet">Rp 550.000</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Rata-rata Kredit</div>
+                        <div class="summary-value" id="avgKredit">Rp 233.333</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Transaksi Terakhir</div>
+                        <div class="summary-value" id="lastTransaction">15 Feb 2024</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2024 Tabungan Sederhana. Halaman Daftar Riwayat Tabungan.</p>
+        </div>
+    </div>
+
+    <script>
+        // Get username from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get('username') || 'Pengguna';
+        
+        // Data and state
+        let allTransactions = [];
+        let filteredTransactions = [];
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set user data
+            document.getElementById('userAvatar').textContent = username.charAt(0).toUpperCase();
+            
+            // Load data
+            loadTransactionData();
+            
+            // Set up event listeners
+            document.getElementById('filterType').addEventListener('change', filterTransactions);
+            document.getElementById('searchInput').addEventListener('input', filterTransactions);
+            
+            // Focus on search input
+            document.getElementById('searchInput').focus();
+        });
+        
+        // Load transaction data
+        function loadTransactionData() {
+            const tableLoader = document.getElementById('tableLoader');
+            const emptyState = document.getElementById('emptyState');
+            
+            tableLoader.style.display = 'block';
+            emptyState.style.display = 'none';
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Mock data - in real app, fetch from API
+                allTransactions = [
+                    { no: 1, datee: '2024-01-15', debit: 500000, credit: 0, balance: 500000, information: 'Gaji bulan Januari', username: username },
+                    { no: 2, datee: '2024-01-20', debit: 0, credit: 200000, balance: 300000, information: 'Bayar tagihan listrik', username: username },
+                    { no: 3, datee: '2024-02-01', debit: 1000000, credit: 0, balance: 1300000, information: 'Bonus tahunan perusahaan', username: username },
+                    { no: 4, datee: '2024-02-10', debit: 0, credit: 500000, balance: 800000, information: 'Belanja kebutuhan bulanan', username: username },
+                    { no: 5, datee: '2024-02-15', debit: 700000, credit: 0, balance: 1500000, information: 'Gaji bulan Februari', username: username },
+                    { no: 6, datee: '2024-02-20', debit: 0, credit: 300000, balance: 1200000, information: 'Bayar internet dan TV kabel', username: username },
+                    { no: 7, datee: '2024-03-01', debit: 800000, credit: 0, balance: 2000000, information: 'Gaji bulan Maret', username: username },
+                    { no: 8, datee: '2024-03-05', debit: 0, credit: 400000, balance: 1600000, information: 'Bayar cicilan motor', username: username },
+                    { no: 9, datee: '2024-03-10', debit: 0, credit: 250000, balance: 1350000, information: 'Belanja supermarket', username: username },
+                    { no: 10, datee: '2024-03-15', debit: 500000, credit: 0, balance: 1850000, information: 'Tambahan dari freelance', username: username },
+                    { no: 11, datee: '2024-03-20', debit: 0, credit: 350000, balance: 1500000, information: 'Bayar sewa kos', username: username },
+                    { no: 12, datee: '2024-03-25', debit: 200000, credit: 0, balance: 1700000, information: 'Hadiah ulang tahun', username: username }
+                ];
+                
+                // Calculate totals
+                calculateTotals();
+                
+                // Apply initial filter
+                filterTransactions();
+                
+                tableLoader.style.display = 'none';
+            }, 1500);
+        }
+        
+        // Calculate totals from transactions
+        function calculateTotals() {
+            let totalSaldo = 0;
+            let totalDebet = 0;
+            let totalKredit = 0;
+            
+            if (allTransactions.length > 0) {
+                // Get last balance
+                totalSaldo = allTransactions[allTransactions.length - 1].balance;
+                
+                // Sum all debits and credits
+                allTransactions.forEach(transaction => {
+                    totalDebet += transaction.debit;
+                    totalKredit += transaction.credit;
+                });
+                
+                // Update stats cards
+                document.getElementById('totalSaldo').textContent = formatCurrency(totalSaldo);
+                document.getElementById('totalMasuk').textContent = formatCurrency(totalDebet);
+                document.getElementById('totalKeluar').textContent = formatCurrency(totalKredit);
+                
+                // Update summary
+                document.getElementById('totalTransaksi').textContent = allTransactions.length;
+                document.getElementById('avgDebet').textContent = formatCurrency(totalDebet / allTransactions.filter(t => t.debit > 0).length || 0);
+                document.getElementById('avgKredit').textContent = formatCurrency(totalKredit / allTransactions.filter(t => t.credit > 0).length || 0);
+                document.getElementById('lastTransaction').textContent = formatDate(allTransactions[allTransactions.length - 1].datee);
+            }
+        }
+        
+        // Filter transactions based on filter type and search
+        function filterTransactions() {
+            const filterType = document.getElementById('filterType').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            filteredTransactions = allTransactions.filter(transaction => {
+                // Apply type filter
+                if (filterType === 'debit' && transaction.debit === 0) return false;
+                if (filterType === 'credit' && transaction.credit === 0) return false;
+                
+                // Apply search filter
+                if (searchTerm) {
+                    const searchInInfo = transaction.information.toLowerCase().includes(searchTerm);
+                    const searchInDate = transaction.datee.includes(searchTerm);
+                    const searchInAmount = formatCurrency(transaction.debit || transaction.credit).toLowerCase().includes(searchTerm);
+                    
+                    if (!(searchInInfo || searchInDate || searchInAmount)) return false;
+                }
+                
+                return true;
+            });
+            
+            // Reset to first page
+            currentPage = 1;
+            
+            // Update display
+            updateTableDisplay();
+        }
+        
+        // Update table display with current page
+        function updateTableDisplay() {
+            const tableBody = document.getElementById('tableBody');
+            const emptyState = document.getElementById('emptyState');
+            const pagination = document.getElementById('pagination');
+            
+            tableBody.innerHTML = '';
+            
+            if (filteredTransactions.length === 0) {
+                emptyState.style.display = 'block';
+                pagination.style.display = 'none';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            pagination.style.display = 'flex';
+            
+            // Calculate pagination
+            const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, filteredTransactions.length);
+            const pageTransactions = filteredTransactions.slice(startIndex, endIndex);
+            
+            // Populate table
+            pageTransactions.forEach(transaction => {
+                const tr = document.createElement('tr');
+                
+                // Determine badge based on transaction type
+                const badge = transaction.debit > 0 ? 
+                    '<span class="badge badge-debit">MASUK</span>' : 
+                    '<span class="badge badge-credit">KELUAR</span>';
+                
+                tr.innerHTML = `
+                    <td class="no-cell">${transaction.no}</td>
+                    <td class="date-cell">${formatDate(transaction.datee

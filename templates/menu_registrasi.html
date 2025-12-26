@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pilih Jenis Pendaftaran - Tabungan Sederhana</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #3a7bd5, #00d2ff);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.8rem;
+            font-weight: 700;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 1.1rem;
+            max-width: 80%;
+            margin: 0 auto;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            background: linear-gradient(90deg, #2c3e50, #4a6491);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            position: relative;
+        }
+
+        .card-header::before, .card-header::after {
+            content: "---";
+            position: absolute;
+            color: #00d2ff;
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+        }
+
+        .card-header::before {
+            left: 20px;
+        }
+
+        .card-header::after {
+            right: 20px;
+        }
+
+        .menu {
+            padding: 40px;
+        }
+
+        .menu-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .menu-items {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 25px;
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-item:hover {
+            background-color: #e9f7fe;
+            border-color: #3a7bd5;
+            transform: translateX(10px);
+        }
+
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 5px;
+            background: linear-gradient(to bottom, #3a7bd5, #00d2ff);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .menu-item:hover::before {
+            opacity: 1;
+        }
+
+        .menu-number {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin-right: 25px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(58, 123, 213, 0.3);
+        }
+
+        .menu-content {
+            flex-grow: 1;
+        }
+
+        .menu-item-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .menu-item-desc {
+            font-size: 1rem;
+            color: #7f8c8d;
+            line-height: 1.5;
+        }
+
+        .menu-item-badge {
+            margin-left: 15px;
+            padding: 5px 12px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+
+        .menu-icon {
+            color: #3a7bd5;
+            font-size: 1.8rem;
+            margin-left: 15px;
+            transition: transform 0.3s;
+        }
+
+        .menu-item:hover .menu-icon {
+            transform: scale(1.2);
+        }
+
+        .input-section {
+            padding: 30px 40px;
+            border-top: 1px solid #eee;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .input-label {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .input-container {
+            display: flex;
+            width: 100%;
+            max-width: 300px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .input-field {
+            flex-grow: 1;
+            padding: 18px 20px;
+            border: none;
+            font-size: 1.2rem;
+            font-family: 'Roboto Mono', monospace;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .input-field:focus {
+            outline: none;
+            background: #f8f9fa;
+        }
+
+        .input-btn {
+            background: linear-gradient(135deg, #3a7bd5, #2c3e50);
+            color: white;
+            border: none;
+            padding: 0 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .input-btn:hover {
+            background: linear-gradient(135deg, #2c3e50, #3a7bd5);
+        }
+
+        .input-btn i {
+            font-size: 1.1rem;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding: 0 40px 30px;
+        }
+
+        .nav-btn {
+            padding: 12px 25px;
+            background: #95a5a6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn-primary {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+        }
+
+        .nav-btn-primary:hover {
+            background: linear-gradient(135deg, #219653, #27ae60);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                max-width: 95%;
+            }
+            
+            .card-header {
+                font-size: 1.2rem;
+                padding: 20px;
+            }
+            
+            .menu {
+                padding: 25px;
+            }
+            
+            .menu-item {
+                padding: 20px;
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .menu-number {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .menu-item-badge {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+            
+            .menu-icon {
+                margin-left: 0;
+                margin-top: 15px;
+            }
+            
+            .input-section {
+                padding: 25px;
+            }
+            
+            .navigation {
+                flex-direction: column;
+                gap: 15px;
+                padding: 0 25px 25px;
+            }
+            
+            .nav-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>Tabungan Sederhana</h1>
+            <p>Pilih jenis pendaftaran yang sesuai dengan kebutuhan Anda</p>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                PILIH JENIS PENDAFTARAN
+            </div>
+            
+            <div class="menu">
+                <div class="menu-title">
+                    Silakan pilih tipe akun yang ingin dibuat
+                </div>
+                
+                <div class="menu-items">
+                    <!-- Menu 1: User Savings -->
+                    <div class="menu-item" id="menu1" onclick="selectMenu(1)">
+                        <div class="menu-number">1</div>
+                        <div class="menu-content">
+                            <div class="menu-item-title">User Tabungan</div>
+                            <div class="menu-item-desc">
+                                Daftar sebagai pengguna biasa untuk menabung, menarik, dan mengelola tabungan pribadi Anda
+                            </div>
+                        </div>
+                        <div class="menu-icon">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Menu 2: Admin -->
+                    <div class="menu-item" id="menu2" onclick="selectMenu(2)">
+                        <div class="menu-number">2</div>
+                        <div class="menu-content">
+                            <div class="menu-item-title">Admin</div>
+                            <div class="menu-item-desc">
+                                Akses ke fitur administrasi sistem untuk mengelola pengguna dan transaksi
+                            </div>
+                        </div>
+                        <div class="menu-icon">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <div class="menu-item-badge" id="maintenanceBadge">
+                            DALAM PERBAIKAN
+                        </div>
+                    </div>
+                    
+                    <!-- Menu 3: Kembali -->
+                    <div class="menu-item" id="menu3" onclick="selectMenu(3)">
+                        <div class="menu-number">3</div>
+                        <div class="menu-content">
+                            <div class="menu-item-title">Kembali ke Menu Utama</div>
+                            <div class="menu-item-desc">
+                                Kembali ke halaman utama untuk memilih opsi lain
+                            </div>
+                        </div>
+                        <div class="menu-icon">
+                            <i class="fas fa-arrow-left"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="input-section">
+                <div class="input-label">Pilih menu (1-3):</div>
+                <div class="input-container">
+                    <input type="text" class="input-field" id="menuInput" placeholder="Masukkan angka pilihan" maxlength="1">
+                    <button class="input-btn" id="submitBtn" onclick="processMenu()">
+                        <i class="fas fa-check-circle"></i> PILIH
+                    </button>
+                </div>
+            </div>
+            
+            <!-- <div class="navigation">
+                <button class="nav-btn" onclick="goToHome()">
+                    <i class="fas fa-home"></i> Halaman Utama
+                </button>
+                <button class="nav-btn nav-btn-primary" onclick="showHelp()">
+                    <i class="fas fa-question-circle"></i> Butuh Bantuan?
+                </button>
+            </div> -->
+        </div>
+        
+        <div class="footer">
+            <p>&copy; 2024 Tabungan Sederhana. Menu Registrasi.</p>
+        </div>
+    </div>
+
+    <script>
+        // Element references
+        const menuInput = document.getElementById('menuInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const notification = document.getElementById('notification');
+        const maintenanceBadge = document.getElementById('maintenanceBadge');
+        
+        // Highlight menu saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            menuInput.focus();
+            
+            // Animasi untuk badge maintenance
+            setInterval(() => {
+                maintenanceBadge.style.transform = 'scale(1.05)';
+                setTimeout(() => {
+                    maintenanceBadge.style.transform = 'scale(1)';
+                }, 300);
+            }, 2000);
+        });
+        
+        // Fungsi untuk memilih menu
+        function selectMenu(menuNumber) {
+            // Reset semua highlight
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.style.backgroundColor = '#f8f9fa';
+                item.style.borderColor = 'transparent';
+            });
+            
+            // Highlight menu yang dipilih
+            const selectedItem = document.getElementById(`menu${menuNumber}`);
+            selectedItem.style.backgroundColor = '#e1f5fe';
+            selectedItem.style.borderColor = '#3a7bd5';
+            
+            // Set nilai input
+            menuInput.value = menuNumber;
+            
+            // Animasi feedback
+            selectedItem.style.transform = 'scale(1.02)';
+            setTimeout(() => {
+                selectedItem.style.transform = '';
+            }, 300);
+            
+            // Auto-process jika menu 2 (admin dalam maintenance)
+            if (menuNumber === 2) {
+                setTimeout(() => {
+                    showNotification('Menu Admin sedang dalam perbaikan. Silakan pilih opsi lain.', 'warning');
+                }, 500);
+            }
+        }
+        
+        // Fungsi untuk memproses pilihan menu
+        function processMenu() {
+            const selectedMenu = menuInput.value.trim();
+            
+            // Validasi input
+            if (!selectedMenu || selectedMenu < 1 || selectedMenu > 3) {
+                showNotification('Masukkan pilihan yang valid (1-3)!', 'error');
+                menuInput.focus();
+                return;
+            }
+            
+            // Reset semua highlight
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.style.backgroundColor = '#f8f9fa';
+                item.style.borderColor = 'transparent';
+            });
+            
+            // Highlight menu yang dipilih
+            const selectedItem = document.getElementById(`menu${selectedMenu}`);
+            selectedItem.style.backgroundColor = '#e1f5fe';
+            selectedItem.style.borderColor = '#3a7bd5';
+            
+            // Animasi konfirmasi
+            selectedItem.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                selectedItem.style.transform = '';
+            }, 500);
+            
+            // Proses berdasarkan pilihan
+            switch(selectedMenu) {
+                case '1':
+                    showNotification('Mengarahkan ke pendaftaran User Tabungan...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/register_user';
+                    }, 1500);
+                    break;
+                    
+                case '2':
+                    showNotification('Menu Admin sedang dalam perbaikan. Silakan pilih opsi lain.', 'warning');
+                    // Reset input
+                    menuInput.value = '';
+                    menuInput.focus();
+                    break;
+                    
+                case '3':
+                    showNotification('Kembali ke menu utama...', 'info');
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                    break;
+                    
+                default:
+                    showNotification('Menu tidak tersedia!', 'error');
+                    menuInput.value = '';
+                    menuInput.focus();
+            }
+        }
+        
+        // Fungsi untuk menampilkan notifikasi
+        function showNotification(message, type = 'info') {
+            notification.textContent = message;
+            
+            // Set warna berdasarkan type
+            switch(type) {
+                case 'success':
+                    notification.style.background = '#27ae60';
+                    break;
+                case 'error':
+                    notification.style.background = '#e74c3c';
+                    break;
+                case 'warning':
+                    notification.style.background = '#f39c12';
+                    break;
+                case 'info':
+                    notification.style.background = '#3498db';
+                    break;
+            }
+            
+            notification.style.display = 'block';
+            
+            // Sembunyikan setelah 3 detik
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Fungsi untuk navigasi
+        function goToHome() {
+            showNotification('Kembali ke halaman utama...', 'info');
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 1000);
+        }
+        
+        function showHelp() {
+            showNotification('Pilih 1 untuk User Tabungan, 2 untuk Admin (dalam perbaikan), 3 untuk kembali', 'info');
+        }
+        
+        // Event listener untuk input field
+        menuInput.addEventListener('keyup', function(event) {
+            // Jika tombol Enter ditekan
+            if (event.key === 'Enter') {
+                processMenu();
+            }
+            
+            // Jika input berubah, highlight menu yang sesuai
+            const value = this.value.trim();
+            if (value >= 1 && value <= 3) {
+                selectMenu(value);
+            } else if (value === '') {
+                // Reset highlight jika input kosong
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.style.backgroundColor = '#f8f9fa';
+                    item.style.borderColor = 'transparent';
+                });
+            }
+        });
+        
+        // Event listener untuk angka keyboard
+        document.addEventListener('keydown', function(event) {
+            const key = event.key;
+            
+            // Jika tombol 1, 2, atau 3 ditekan
+            if (key >= '1' && key <= '3') {
+                menuInput.value = key;
+                selectMenu(key);
+                
+                // Auto-process jika 2 ditekan
+                if (key === '2') {
+                    setTimeout(() => {
+                        processMenu();
+                    }, 300);
+                }
+            }
+            
+            // Jika tombol Escape ditekan
+            if (key === 'Escape') {
+                menuInput.value = '';
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.style.backgroundColor = '#f8f9fa';
+                    item.style.borderColor = 'transparent';
+                });
+                menuInput.focus();
+            }
+        });
+        
+        // Animasi hover untuk menu items
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                const menuNumber = this.id.replace('menu', '');
+                menuInput.value = menuNumber;
+            });
+        });
+    </script>
+</body>
+</html>
