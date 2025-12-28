@@ -605,7 +605,6 @@
         
         // Toggle password visibility | ikon mata | mengizinkan user untuk melihat/menyembunyikan password
         let isPasswordVisible = false;
-        
         togglePasswordBtn.addEventListener('click', function() { 
             isPasswordVisible = !isPasswordVisible;
             passwordInput.type = isPasswordVisible ? 'text' : 'password';
@@ -614,7 +613,7 @@
                 '<i class="fas fa-eye"></i>';
         }); 
     
-        // Show error message | Menampilkan pesan error
+        // Show error message | Menampilkan notifikasi pesan error
         function showError(message) {
             errorMessageText.textContent = message;  // Set pesan error
             errorMessage.style.display = 'flex';  // Tampilkan container error
@@ -632,7 +631,35 @@
             }, 5000);
         }
         
-        // Show success message | Menampilkan pesan success
+
+        function showErrorMessage(username, role){
+            showError(message)
+        }
+
+         // Show notification error| Sistem notifikasi fleksibel
+        function showNotificationError(message, type = 'error', role = '') {
+            notificationMessageError.innerHTML = message;
+            
+            // Update notification type
+            notificationError.className = 'notificationError ' + type;
+            const icon = notificationError.querySelector('.notification-icon');
+            if (type === 'error') {
+                icon.className = 'fas fa-exclamation-circle notification-icon';
+            } else if (type === 'warning') {
+                icon.className = 'fas fa-exclamation-triangle notification-icon';
+            }
+            // Show notification
+            notificationError.style.display = 'block'; // Tampilkan notifikasi
+            
+            // Auto hide after 3 seconds
+            setTimeout(() => {
+                notificationError.style.display = 'none';
+            }, 2500);
+        }
+        
+
+
+        // Show success message | Menampilkan notifikasi pesan success
         function showSuccess(username, role) {
             const nama = usernameInput.value;
             console.log('role ku',role)
@@ -663,11 +690,6 @@
             showSuccess(message)
         }
 
-        function showErrorMessage(username, role){
-            showError(message)
-        }
-
-        
         // Show notification sukses| Sistem notifikasi fleksibel
         function showNotificationSuccess(message, type = 'success', role = '') {
             notificationMessageSuccess.innerHTML = message;
@@ -698,27 +720,11 @@
             }, 2500);
         }
 
-        // Show notification sukses| Sistem notifikasi fleksibel
-        function showNotificationError(message, type = 'error', role = '') {
-            notificationMessageError.innerHTML = message;
-            
-            // Update notification type
-            notificationError.className = 'notificationError ' + type;
-            const icon = notificationError.querySelector('.notification-icon');
-            
-            // Show notification
-            notificationError.style.display = 'block'; // Tampilkan notifikasi
-            
-            // Auto hide after 3 seconds
-            setTimeout(() => {
-                notificationError.style.display = 'none';
-            }, 2500);
-        }
-        
+
         // Go back to home
         function goBackToHome() {
-                showNotificationError('Kembali ke halaman utama...', 'warning');
-            
+                showNotificationError('Akan kembali ke halaman home!', 'warning');
+
             // Clear form
             loginForm.reset();
             errorMessage.style.display = 'none';
@@ -774,19 +780,6 @@
                 await new Promise(resolve => setTimeout(resolve, 500));
                 
                 // Mock API response - In real app, replace with actual fetch call
-                // const response = await fetch('/api/login', {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                //     body: JSON.stringify({
-                //         username: username,
-                //         password: password
-                //     })
-                // });
-                
-                // const result = await response.json();
-
                 const API_URL ='/api_login/'; // Sesuaikan dengan route Flask Anda
                 console.log('Mengirim req login ke: ', API_URL);
                 console.log('Data yang dikirim:', { username, password });
@@ -865,9 +858,7 @@
                     window.location.reload();
                 }
                 }, 1500); // 1.5 detik cukup untuk lihat notifikasi
-
-                    
-
+               
                 } else {
                      // Login failed
                     const errorMsg = result.error || result.message || 'Login gagal!';
