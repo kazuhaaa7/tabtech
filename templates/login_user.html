@@ -684,6 +684,8 @@
             // Add success class to inputs
             usernameInput.classList.add('success'); 
             passwordInput.classList.add('success');
+
+            
         }
         
         function showSuccessMessage(username, role){
@@ -836,13 +838,18 @@
                         redirectUrl = result.redirect;
                         console.log('Menggunakan redirect dari backend:', redirectUrl);
                     }else if(result.role === 'User Tabungan'){
-                        redirectUrl = '/menu_user/';
+                        redirectUrl = `/menu_user/`;
                         console.log('Menggunakan redirect dari backend:', redirectUrl);
                     } else if (result. role === 'admin'){
                         redirectUrl = '/menu_registrasi/';
                         console.log('Menggunakan redirect dari backend:', redirectUrl);
                     }
                 
+                    // Simpan username sebelum redirect
+                    localStorage.setItem('loggedInUser', result.username);
+                    console.log('ini', result.username)
+
+                    
                      // Debug: cek current path vs target path
                     console.log('Current path:', window.location.pathname);
                     console.log('Target path:', redirectUrl);

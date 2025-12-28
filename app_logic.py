@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, url_for, session, flash, jsonify, redirect
+from flask import Flask, request, render_template, url_for, session, flash, jsonify, redirect, current_app
 from markupsafe import escape
 import csv
 import os
@@ -610,7 +610,7 @@ def tambah_saldo_page():
         return render_template("tambah_saldo.html", history=[], error= "koneksi database gagal!")
     
     try:
-        cursor =  connection.cursor
+        cursor =  connection.cursor()
         query = """
         SELECT no,
         datee,
@@ -620,7 +620,7 @@ def tambah_saldo_page():
         information,
         username
         FROM tabungan.tabungan 
-        WHERE usename = %s 
+        WHERE username = %s 
         ORDER BY no DESC
 """
         cursor.execute(query, (session['username'],)) 
@@ -653,16 +653,97 @@ def tambah_saldo_page():
             connection.close()
 
 
+@app.route('/api_get_saldo/', methods=['GET'])
+def api_get_saldo():
+    """API untuk ambil saldo"""
+
+#     # proses penambahan ke database
+#     connection = connect_db()
+#     if connection is None:
+#         return jsonify({'error': 'Koneksi database gagal!1'}), 500
+    
+#     try:
+#         # Get username dari query parameter
+#         username = request.args.get('username')
+#         print(f"Username requested: {username}")
+        
+#         if not username:
+#             print("ERROR: Username parameter tidak diketahui")
+#             return jsonify({'error': 'Username parameter tidak ada'}), 400
+        
+#         # Cek di database - SESUAIKAN DENGAN MODEL ANDA
+#         user = user.query.filter_by(username=username).first()
+#         print(f"User found: {user is not None}")
+        
+
+#         # Logika ambil saldo (contoh)
+#         try:
+#             cursor = connection.cursor()
+#             cursor.execute("""
+#             SELECT balance FROM tabungan.tabungan
+#             WHERE username = %s
+#             ORDER BY no DESC
+#             LIMIT 1 
+#     """, (session['username'],))
+#             result = cursor.fetchone()
+#             saldo_terakhir = result[0] if result else 0 
+# #  # fungsi kamu sendiri
+#             return jsonify({"username": username, "saldo": saldo_terakhir}), 200
+#         except Exception as e:
+#             app.logger.error(f"Error saat ambil saldo untuk {username}: {e}")
+#             return jsonify({"error": "Gagal ambil saldo"}), 500 
+
+#     except Error as error:
+#         return jsonify({'error': f'Terjadi kesalahan {error}'}), 500
+    
+
+#     finally:
+#             if cursor:
+#                 cursor.close()
+#             if connection:
+#                 connection.close()    
+    try:
+            # Koneksi ke database
+            connection = connect_db()
+            if connection is None:
+                return jsonify({'error': 'Koneksi database gagal!'}), 500
+
+            # Query saldo terakhir berdasarkan nomor transaksi tertinggi
+            cursor = connection.cursor()
+            cursor.execute("""
+                SELECT balance FROM tabungan.tabungan
+                ORDER BY no DESC
+                LIMIT 1
+            """)
+            
+            result = cursor.fetchone()
+            saldo_terakhir = result[0] if result else 0
+
+            return jsonify({
+                "saldo": saldo_terakhir
+            }), 200
+
+    except Exception as e:
+        current_app.logger.error(f"Error di api_get_saldo: {str(e)}")
+        return jsonify({'error': 'Gagal mengambil saldo terakhir'}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+
 @app.route('/api_tambah_saldo/', methods=['POST'])
 def api_tambah_saldo():
     """API untuk tambah saldo"""
 
     if 'username' not in session:
         return jsonify({'error': 'Silahkan logi terlebih dahulu'}), 401
-    
+    if not request.is_json:
+        return jsonify({"error": "Request harus berupa JSON"}), 400
     data = request.get_json()
     jumlah = data.get('jumlah')
-    keterangan = data.get('keterangan')
+    keterangan = data.get('keterangan', '')
 
     # validasi
     if not jumlah or not keterangan:
@@ -670,8 +751,8 @@ def api_tambah_saldo():
     
     try:
         jumlah = int(jumlah)
-        if jumlah <= 0:
-            return jsonify({'error':'Nominal harus lebih dari 0!'}),400
+        if jumlah < 1000:
+            return jsonify({'error':'Nominal harus lebih dari 1000!'}),400
     except ValueError:
         return jsonify({'error': 'Jumlah harus berupa angka '}), 400
     
@@ -686,7 +767,7 @@ def api_tambah_saldo():
         # ambil nomer transaksi paling akhir | logic idx
         cursor.execute("SELECT MAX(no) FROM tabungan.tabungan")
         idx = cursor.fetchone()
-        no = (idx or 0) + 1
+        no = (idx[0] if idx and idx[0] is not None else 0) + 1
 
 
         # pilih lalu ambil 1 baris saldo paling akhir
@@ -704,14 +785,14 @@ def api_tambah_saldo():
         saldo_baru = saldo_terakhir + jumlah
         tanggal = datetime.now().strftime('%Y-%m-%d')
 
-        # insert transaksi
+        # insert  atau simpan transaksi
         insert_query = """
         INSERT INTO tabungan.tabungan
         (no, datee, debit, credit, balance, information, username)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
 """
 
-        cursor.execute(insert_query, (no, tanggal, jumlah, 0, saldo_baru, tanggal, session['username']))
+        cursor.execute(insert_query, (no, tanggal, jumlah, 0, saldo_baru, keterangan, session['username']))
         connection.commit()
 
 
@@ -727,9 +808,9 @@ def api_tambah_saldo():
     
     finally:
         if cursor:
-            cursor.close
+            cursor.close()
         if connection:
-            connection.close
+            connection.close()
 
 
 # ==================== TAMBAH KREDIT ====================
@@ -872,6 +953,7 @@ def tambah_kredit_page():
     if 'username' not in session:
         return redirect('/login/')
     
+    
    # ambil data riwayat untuk ditampilkan
     connection = connect_db()
     if connection is None:
@@ -927,10 +1009,11 @@ def api_tambah_kredit():
 
     if 'username' not in session:
         return jsonify({'error': 'Silahkan logi terlebih dahulu'}), 401
-    
+    if not request.is_json:
+        return jsonify({"error": "Request harus berupa JSON"}), 400
     data = request.get_json()
     jumlah = data.get('jumlah')
-    keterangan = data.get('keterangan')
+    keterangan = data.get('keterangan', '')
 
     # validasi
     if not jumlah or not keterangan:
@@ -939,7 +1022,7 @@ def api_tambah_kredit():
     try:
         jumlah = int(jumlah)
         if jumlah <= 0:
-            return jsonify({'error':'Nominal harus lebih dari 0!'}),400
+            return jsonify({'error':'Nominal harus lebih dari 1000!'}),400
     except ValueError:
         return jsonify({'error': 'Jumlah harus berupa angka '}), 400
     
@@ -954,7 +1037,7 @@ def api_tambah_kredit():
         # ambil nomer transaksi paling akhir | logic idx
         cursor.execute("SELECT MAX(no) FROM tabungan.tabungan")
         idx = cursor.fetchone()
-        no = (idx or 0) + 1
+        no = (idx[0] if idx and idx[0] is not None else 0) + 1
 
 
         # pilih lalu ambil 1 baris saldo paling akhir
@@ -979,7 +1062,7 @@ def api_tambah_kredit():
         VALUES (%s, %s, %s, %s, %s, %s, %s)
 """
 
-        cursor.execute(insert_query, (no, tanggal, 0, jumlah, saldo_baru, tanggal, session['username']))
+        cursor.execute(insert_query, (no, tanggal, 0, jumlah, saldo_baru, keterangan, session['username']))
         connection.commit()
 
 
@@ -995,9 +1078,9 @@ def api_tambah_kredit():
     
     finally:
         if cursor:
-            cursor.close
+            cursor.close()
         if connection:
-            connection.close
+            connection.close()
 
 @app.route("/daftar_riwayat/")
 def daftar_riwayat_page():
@@ -1170,6 +1253,8 @@ def api_daftar_riwayat():
 def logout():
     """Logout dan hapus session"""
     return redirect('/')
+
+# Pastikan endpoint ini ada dan benar
 
 
 if __name__ == '__main__':
