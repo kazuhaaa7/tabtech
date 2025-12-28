@@ -8,10 +8,12 @@ from datetime import datetime
 import time
 from psycopg2 import Error
 from db.database import connect_db
+from dotenv import load_dotenv 
 
 
 app = Flask(__name__)
-
+load_dotenv()
+app.secret_key = os.getenv('FLASK_KEY')
 
 @app.route('/')
 def home_menu():
@@ -82,9 +84,9 @@ def api_menu():
     pilihan = data.get('pilihan')
 
     if pilihan == '1':
-        return jsonify({'redirect': '/login/'})
-    elif pilihan == '2':
         return jsonify({'redirect': '/registrasi_user/'})
+    elif pilihan == '2':
+        return jsonify({'redirect': '/admin'})
     elif pilihan == '3':
         return jsonify({'message' : 'Terima kasih telah mengguanakan sistem ini'})
     else:
@@ -341,6 +343,10 @@ def validasiLogin():
 @app.route("/api_login/", methods=['POST'])
 def api_login_user():
     """API untuk proses login"""
+     # 1. Validasi Content-Type
+    if not request.is_json:
+        return jsonify({'success': False, 'message': 'Content-Type must be application/json'}), 400
+    
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
@@ -358,9 +364,9 @@ def api_login_user():
         cursor = connection.cursor()
 
         check_query = """
-        SELECT username, pw, roles, 
+        SELECT username, pw, roles 
         FROM users.pengguna 
-        WHERE username = %s AND password =  %s
+        WHERE username = %s AND pw =  %s
 """
         cursor.execute(check_query, (username, password))
         check_user = cursor.fetchone()
@@ -368,19 +374,32 @@ def api_login_user():
         if check_user:
             # simpan session
             session['username'] = check_user[0]
-            session['role'] = check_user[2]
+            session['roles'] = check_user[2]
+
+        
+        # tentukan redirect based role
+            # if check_user['roles'] == 'User Tabungan':
+            #     redirect_url = '/menu_user/'
+            # elif check_user['roles'] == 'admin':
+            #     redirect_url = '/admin'
+            # else:
+            #     redirect_url = '/'
+
 
             return jsonify({
                 'success' : True,
                 'message' : f'Login berhasil! Selamat datang {check_user[0]}',
-        'redirect' : '/menu_user/' if check_user[2] == 'User Tabungan' else '/admin'
+                'redirect' : '/menu_user/' if check_user[2] == 'User Tabungan' else '/admin',
+                'username' : check_user[0],
+                'role': check_user[2]
+                # 'redirect' :  redirect_url
             })
         else:
             return jsonify({'error': f'username atau password salah'}), 401
             # Error 401 "Unauthorized" artinya permintaan Anda ditolak karena tidak ada kredensial autentikasi yang valid atau belum login untuk mengakses sumber daya yang diminta
         
         # baca data atau query untuk validasi login
-    except Error as error:
+    except Exception as error:
         return jsonify({'error': f'Terjadi kesalahan saat login{error}'}),500
     
     finally:
@@ -393,7 +412,7 @@ def api_login_user():
 # ================ MENU USER ===================
 @app.route("/menu_user/")
 def menu_user1():
-        """Halaman menu user (harus login)"""
+    """Halaman menu user (harus login)"""
     # while True:
     #     os.system('cls')
     #     print(f"=== MENU User Tabungan ===\nHalo {username}")
@@ -416,10 +435,8 @@ def menu_user1():
     #         print("Pilihan tidak valid!")
     #         input("Tekan Enter...")
     #         return 
-        if 'username' not in session:
-            return redirect("/login/")
         
-        return render_template("menu_user.html", username=session[0])
+    return render_template("menu_user.html")
 
 
 @app.route("/api_menu_user/", methods=['POST'])
@@ -1149,10 +1166,9 @@ def api_daftar_riwayat():
   # ==================== LOGOUT ====================
 
 
-@app.route('/logout')
+@app.route('/logout/')
 def logout():
     """Logout dan hapus session"""
-    session.clear()
     return redirect('/')
 
 

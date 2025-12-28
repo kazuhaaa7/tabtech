@@ -381,17 +381,26 @@
                 
                 // Tampilkan pesan berdasarkan pilihan
                 let message = '';
-                switch(menuNumber) {
-                    case '1':
-                        // window.location.href = 'index.html';
-                        message = 'Anda memilih Login. Mengarahkan ke halaman login...';
-                        break;
-                    case '2':
-                        message = 'Anda memilih Registrasi. Mengarahkan ke halaman pendaftaran...';
-                        break;
-                    case '3':
-                        message = 'Anda memilih Keluar. Mengucapkan selamat tinggal...';
-                        break;
+                // switch(menuNumber) {
+                //     case '1':
+                //         window.location.href = '/login/';
+                //         //message = 'Anda memilih Login. Mengarahkan ke halaman login...';
+                //         break;
+                //     case '2':
+                //         window.location.href = '/registrasi_user/'
+                //         //message = 'Anda memilih Registrasi. Mengarahkan ke halaman pendaftaran...';
+                //         break;
+                //     case '3':
+                //         message = 'Anda memilih Keluar. Mengucapkan selamat tinggal...';
+                //         break;
+                // }
+
+                if (menuNumber === '1'){
+                    window.location.href = '/login/';
+                } else if (menuNumber === '2'){
+                    window.location.href = '/menu_registrasi/';
+                } else if (menuNumber === '3'){
+                    window.location.href = '/logout';
                 }
                 
                 // Tampilkan alert
