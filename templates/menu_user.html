@@ -791,45 +791,13 @@
     
     // Load saldo dari database
     async function loadUserSaldo() {
-//         API_GET_SALDO = '/api_get_saldo/'
-//         try {
-//             console.log('Loading saldo for user:', username);
-// // ?username=${encodeURIComponent(username)}
-//             const response = await fetch(API_GET_SALDO, {
-//                 method: 'GET',
-//                 headers: {
-//                     'Content-Type': 'application/json',
-//                     'Accept': 'application/json'
-//                 },
-//                 credentials: 'include'
-//             });
-
-//             if (!response.ok) {
-//                 throw new Error(`HTTP error! status: ${response.status}`);
-//             }
-            
-//             const result = await response.json();
-//             console.log('Saldo response:', result);
-            
-//             if (result.success && saldoElement) {
-//                 // Format saldo dari database
-//                 const saldo = result.saldo || 0;
-//                 saldoElement.textContent = `Rp ${saldo.toLocaleString()}`;
-//                 console.log('Saldo updated from database:', saldo);
-//             } else {
-//                 console.error('Failed to load saldo:', result.error);
-//                 // Default saldo jika gagal
-//                 saldoElement.textContent = 'Rp 0';
-//             }
-//         } catch (error) {
-//             console.error('Error loading saldo:', error);
-//             // Fallback saldo
-//             if (saldoElement) saldoElement.textContent = 'Rp 0';
-//         }
     const API_GET_SALDO = '/api_get_saldo/'; // trailing slash sesuai route Flask
 
     // Opsional: pastikan saldoElement ada
-    const saldoElement = document.querySelector('.saldo-amount'); // perbaiki class name
+    const saldoElement = document.querySelector('.saldo-amount');
+    const totalMasukElement = document.getElementById('totalMasukMenu');
+    const totalKeluarElement = document.getElementById('totalKeluarMenu');
+    
     if (!saldoElement) {
         console.warn('Element saldo tidak ditemukan di DOM');
         return;
@@ -840,7 +808,6 @@
 
         const response = await fetch(API_GET_SALDO, {
             method: 'GET',
-            // Hapus 'Content-Type' untuk GET request
             headers: {
                 'Accept': 'application/json'
             },
@@ -854,7 +821,7 @@
         const result = await response.json();
         console.log('Saldo response:', result);
 
-        //  Perbaikan: cek keberadaan 'saldo', bukan 'success'
+        // Update saldo
         if (typeof result.saldo !== 'undefined') {
             const saldo = result.saldo || 0;
             saldoElement.textContent = `Rp ${saldo.toLocaleString('id-ID')}`;
@@ -862,6 +829,21 @@
         } else {
             console.error('Respons tidak mengandung saldo:', result);
             saldoElement.textContent = 'Rp 0';
+        }
+
+        // Update total debit (masuk) dan credit (keluar) bulan ini
+        if (typeof result.total_debit_bulan !== 'undefined') {
+            const totalDebit = result.total_debit_bulan || 0;
+            if (totalMasukElement) {
+                totalMasukElement.textContent = `Rp ${totalDebit.toLocaleString('id-ID')}`;
+            }
+        }
+
+        if (typeof result.total_credit_bulan !== 'undefined') {
+            const totalCredit = result.total_credit_bulan || 0;
+            if (totalKeluarElement) {
+                totalKeluarElement.textContent = `Rp ${totalCredit.toLocaleString('id-ID')}`;
+            }
         }
 
     } catch (error) {
@@ -937,6 +919,9 @@
                 // Reload saldo untuk memastikan data fresh
                 await loadUserSaldo();
 
+                // Beri tahu halaman lain (daftar_riwayat) bahwa ada update
+                window.dispatchEvent(new Event('transactionUpdated'));
+
                 } else {
                 showNotification(result.error || 'Gagal menambah saldo', 'error');
                 }
@@ -1007,9 +992,16 @@
                 // }
                 showNotification(`Kredit berhasil ditambahkan! Kredit baru: Rp ${result.saldo_baru.toLocaleString()}`, 'success');
                 closeModal('tambahKreditModal');
+
+                // Simpan username sebelum redirect
+                localStorage.setItem('loggedInUser', result.username);
+                console.log('ini', result.username);
                 
                 // Update saldo setelah transaksi kredit
                 await loadUserSaldo();
+
+                // Beri tahu halaman lain (daftar_riwayat) bahwa ada update
+                window.dispatchEvent(new Event('transactionUpdated'));
                 
             } else {
                 showNotification(result.error || 'Gagal menambah kredit', 'error');
@@ -1080,7 +1072,9 @@
                     break;
                     
                 case '3':
+
                     showNotification('Mengarahkan ke Riwayat Tabungan...', 'success');
+                      // Simpan username sebelum redirect
                     setTimeout(() => {
                         window.location.href = `/daftar_riwayat/`;
                     }, 1000);

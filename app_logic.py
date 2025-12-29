@@ -1,3 +1,4 @@
+from unittest import result
 from flask import Flask, request, render_template, url_for, session, flash, jsonify, redirect, current_app
 from markupsafe import escape
 import csv
@@ -655,61 +656,17 @@ def tambah_saldo_page():
 
 @app.route('/api_get_saldo/', methods=['GET'])
 def api_get_saldo():
-    """API untuk ambil saldo"""
-
-#     # proses penambahan ke database
-#     connection = connect_db()
-#     if connection is None:
-#         return jsonify({'error': 'Koneksi database gagal!1'}), 500
+    """API untuk ambil saldo terakhir dan summary transaksi bulan ini"""
     
-#     try:
-#         # Get username dari query parameter
-#         username = request.args.get('username')
-#         print(f"Username requested: {username}")
-        
-#         if not username:
-#             print("ERROR: Username parameter tidak diketahui")
-#             return jsonify({'error': 'Username parameter tidak ada'}), 400
-        
-#         # Cek di database - SESUAIKAN DENGAN MODEL ANDA
-#         user = user.query.filter_by(username=username).first()
-#         print(f"User found: {user is not None}")
-        
-
-#         # Logika ambil saldo (contoh)
-#         try:
-#             cursor = connection.cursor()
-#             cursor.execute("""
-#             SELECT balance FROM tabungan.tabungan
-#             WHERE username = %s
-#             ORDER BY no DESC
-#             LIMIT 1 
-#     """, (session['username'],))
-#             result = cursor.fetchone()
-#             saldo_terakhir = result[0] if result else 0 
-# #  # fungsi kamu sendiri
-#             return jsonify({"username": username, "saldo": saldo_terakhir}), 200
-#         except Exception as e:
-#             app.logger.error(f"Error saat ambil saldo untuk {username}: {e}")
-#             return jsonify({"error": "Gagal ambil saldo"}), 500 
-
-#     except Error as error:
-#         return jsonify({'error': f'Terjadi kesalahan {error}'}), 500
-    
-
-#     finally:
-#             if cursor:
-#                 cursor.close()
-#             if connection:
-#                 connection.close()    
     try:
             # Koneksi ke database
             connection = connect_db()
             if connection is None:
                 return jsonify({'error': 'Koneksi database gagal!'}), 500
 
-            # Query saldo terakhir berdasarkan nomor transaksi tertinggi
             cursor = connection.cursor()
+            
+            # Query saldo terakhir
             cursor.execute("""
                 SELECT balance FROM tabungan.tabungan
                 ORDER BY no DESC
@@ -719,8 +676,24 @@ def api_get_saldo():
             result = cursor.fetchone()
             saldo_terakhir = result[0] if result else 0
 
+            # Query summary transaksi bulan ini (semua user)
+            cursor.execute("""
+                SELECT
+                    COALESCE(SUM(debit), 0) as total_debit,
+                    COALESCE(SUM(credit), 0) as total_credit
+                FROM tabungan.tabungan
+                WHERE DATE_TRUNC('month', datee) = DATE_TRUNC('month', CURRENT_DATE)
+            """)
+            
+            summary_result = cursor.fetchone()
+            total_debit_bulan = summary_result[0] if summary_result else 0
+            total_credit_bulan = summary_result[1] if summary_result else 0
+
             return jsonify({
-                "saldo": saldo_terakhir
+                "saldo": saldo_terakhir,
+                "total_debit_bulan": total_debit_bulan,
+                "total_credit_bulan": total_credit_bulan,
+                "total_transactions": None  # Will be calculated if needed
             }), 200
 
     except Exception as e:
@@ -732,6 +705,10 @@ def api_get_saldo():
             cursor.close()
         if connection:
             connection.close()
+
+
+
+
 
 @app.route('/api_tambah_saldo/', methods=['POST'])
 def api_tambah_saldo():
@@ -791,7 +768,7 @@ def api_tambah_saldo():
         (no, datee, debit, credit, balance, information, username)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
 """
-
+        print(f"DEBUG: Inserting with username = {session['username']}")  # Debug log
         cursor.execute(insert_query, (no, tanggal, jumlah, 0, saldo_baru, keterangan, session['username']))
         connection.commit()
 
@@ -1061,7 +1038,7 @@ def api_tambah_kredit():
         (no, datee, debit, credit, balance, information, username)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
 """
-
+        print(f"DEBUG: Inserting kredit with username = {session['username']}")  # Debug log
         cursor.execute(insert_query, (no, tanggal, 0, jumlah, saldo_baru, keterangan, session['username']))
         connection.commit()
 
@@ -1162,6 +1139,88 @@ def daftar_riwayat_page():
             return redirect('/login/')
         return render_template("daftar_riwayat.html",username = session['username'])
 
+@app.route('/api_get_transaksi/', methods=['GET'])
+def api_get_transaksi():
+    """API untuk mendapatkan ringkasan transaksi debit dan credit user"""
+
+    try:
+        connection = connect_db()
+        if connection is None:
+            return jsonify({'error': 'Koneksi database gagal!'}), 500
+
+        cursor = connection.cursor()
+
+        # Query untuk mendapatkan semua transaksi dari semua user (tabungan bersama)
+        cursor.execute("""
+            SELECT no, datee, debit, credit, balance, information, username
+            FROM tabungan.tabungan
+            ORDER BY no DESC
+        """)
+
+        transactions = cursor.fetchall()
+
+        # Format data transaksi
+        formatted_transactions = []
+        for row in transactions:
+            # Pastikan username tidak null
+            formatted_transactions.append({
+                'no': row[0],
+                'tanggal': row[1].strftime('%Y-%m-%d') if row[1] else '-',
+                'debit': f"Rp {row[2]:,}" if row[2] and row[2] > 0 else '-',
+                'credit': f"Rp {row[3]:,}" if row[3] and row[3] > 0 else '-',
+                'balance': f"Rp {row[4]:,}" if row[4] else 'Rp 0',
+                'information': row[5] or '-',
+                'username': row [6] if row[6] else session.get('username', 'Unknown')
+            })
+
+        # Query untuk total debit dan credit bulan ini (semua user)
+        cursor.execute("""
+            SELECT
+                COALESCE(SUM(debit), 0) as total_debit,
+                COALESCE(SUM(credit), 0) as total_credit
+            FROM tabungan.tabungan
+            WHERE DATE_TRUNC('month', datee) = DATE_TRUNC('month', CURRENT_DATE)
+        """)
+
+        summary_result = cursor.fetchone()
+        total_debit_bulan = summary_result[0] if summary_result else 0
+        total_credit_bulan = summary_result[1] if summary_result else 0
+
+                # Query saldo terakhir
+        cursor.execute("""
+                SELECT balance FROM tabungan.tabungan
+                ORDER BY no DESC
+                LIMIT 1
+            """)
+
+        result = cursor.fetchone()
+        saldo_terakhir = result[0] if result else 0
+
+
+        return jsonify({
+            'success': True,
+            'transactions': formatted_transactions,
+            'summary': {
+                'total_debit_bulan': total_debit_bulan,
+                'total_credit_bulan': total_credit_bulan,
+                'total-saldo': saldo_terakhir
+            }
+        }), 200
+        
+
+
+
+
+    except Exception as e:
+        current_app.logger.error(f"Error di api_get_transaksi_summary: {str(e)}")
+        return jsonify({'success': False,
+            'error': 'Gagal mengambil data transaksi'}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
 
 @app.route('/api_daftar_riwayat/')
 def api_daftar_riwayat():
@@ -1197,11 +1256,10 @@ def api_daftar_riwayat():
         for row in history:
             formatted_history.append({
                 'no' : row[0],
-                'tanggal': row[1].strftime('%Y-%m-%d') if row[1] else '',                
-                'datee': row[2],
-                'debit' : f"Rp {row[3]:,}" if row[3] else f'Rp 0', 
-                'credit' : f"Rp {row[4]:,}" if row[4] else f'Rp 0',
-                'balance' : f"Rp {row[5]:,}" if row[5] else f'Rp 0',
+                'tanggal': row[1].strftime('%Y-%m-%d') if row[1] else '',
+                'debit' : f"Rp {row[2]:,}" if row[2] else 'Rp 0',
+                'credit' : f"Rp {row[3]:,}" if row[3] else 'Rp 0',
+                'balance' : f"Rp {row[4]:,}" if row[4] else 'Rp 0',
                 'information' : row[5] or '',
                 'username' : row[6] or ''
             })
@@ -1253,6 +1311,16 @@ def api_daftar_riwayat():
 def logout():
     """Logout dan hapus session"""
     return redirect('/')
+
+@app.route('/api_get_username/', methods=['GET'])
+def get_username():
+    """Endpoint untuk mengambil username dari session"""
+    username = session.get('username', 'User Tabungan')
+    print(f"DEBUG: get_username - username dari session: {username}")
+    return jsonify({
+        'username': username,
+        'logged_in': username != 'User Tabungan'
+    })
 
 # Pastikan endpoint ini ada dan benar
 
