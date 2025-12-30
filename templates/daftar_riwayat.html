@@ -995,7 +995,10 @@
     <script>
         // Get username from URL atau localStorage
         const urlParams = new URLSearchParams(window.location.search);
-        let username = localStorage.getItem('loggedInUser') || 'User Tabungan';
+        let username = localStorage.getItem('loggedInUser');
+        if (!username || username === 'undefined') {
+            username = urlParams.get('username') || 'User Tabungan';
+        }
         
         console.log('Debug - localStorage username:', username);
         console.log('Debug - localStorage content:', localStorage);
@@ -1125,30 +1128,33 @@
         
         // Calculate totals from transactions
         function calculateTotals() {
-            let totalSaldo = 0;
-            let totalDebet = 0;
-            let totalKredit = 0;
+            updateSummaryUI();
+            // let totalSaldo = 0;
+            // let totalDebet = 0;
+            // let totalKredit = 0;
             
-            if (allTransactions.length > 0) {
-                // Get last balance
-                totalSaldo = parseCurrency(allTransactions[allTransactions.length - 1].balance);
+            // if (allTransactions.length > 0) {
+            //     // Get last balance
+            //     totalSaldo = parseCurrency(allTransactions[allTransactions.length - 1].balance);
                 
-                // Sum all debits and credits - parse dari format string
-                allTransactions.forEach(transaction => {
-                    totalDebet += parseCurrency(transaction.debit || '0');
-                    totalKredit += parseCurrency(transaction.credit || '0');
-                });
+            //     // Sum all debits and credits - parse dari format string
+            //     allTransactions.forEach(transaction => {
+            //         totalDebet += parseCurrency(transaction.debit || '0');
+            //         totalKredit += parseCurrency(transaction.credit || '0');
+            //         totalSaldo = totalDebet-totalKredit;
+            //     });
                 
-                // Update stats cards
-                document.getElementById('totalSaldo').textContent = formatCurrency(totalSaldo);
-                document.getElementById('totalMasuk').textContent = formatCurrency(totalDebet);
-                document.getElementById('totalKeluar').textContent = formatCurrency(totalKredit);
+            //     // Update stats cards
+            //     updateSummaryUI(totalSaldo, totalDebet, totalKredit);
+            //     // document.getElementById('totalSaldo').textContent = parseCurrency(totalSaldo);
+            //     // document.getElementById('totalMasuk').textContent = parseCurrency(totalDebet);
+            //     // document.getElementById('totalKeluar').textContent = parseCurrency(totalKredit);
                 
                 // Update summary
                 document.getElementById('totalTransaksi').textContent = allTransactions.length;
                 document.getElementById('lastTransaction').textContent = formatDate(allTransactions[allTransactions.length - 1].datee);
             }
-        }
+        
         
         // Filter transactions based on filter type and search
         function filterTransactions() {
@@ -1281,7 +1287,7 @@
         
         // Go to add saldo
         function goToAddSaldo() {
-            window.location.href = '/tambah_saldo';
+            window.location.href = '/tambah_saldo/';
         }
         
         // Show notification
@@ -1357,7 +1363,7 @@
             
             try {
                 // Add timestamp to prevent caching
-                const API_GET_TRANSAKSI =  '/api_get_transaksi'
+                const API_GET_TRANSAKSI =  `/api_get_transaksi?username=${encodeURIComponent(username)}`;
                 const response = await fetch( API_GET_TRANSAKSI, {
                     method: 'GET',
                     headers: {
@@ -1373,30 +1379,72 @@
                 }
                 
                 const data = await response.json();
-                console.log('saldo response:', data);
-
+                const saldo = data.summary || 0;
+                console.log('saldo response:', saldo);
+                window.appData = window.appData || {};
+                // window.appData.saldo.total_saldo = totalSaldo; 
+                
                 if (data.success && Array.isArray(data.transactions)) {
                     allTransactions = data.transactions;
                     console.log('Data transaksi:', allTransactions);
+                    
+                    window.appData = window.appData || {};
+                    appData.summary = data.summary; 
                     calculateTotals();
                     filterTransactions();
-                    console.log(`Data riwayat berhasil dimuat: ${allTransactions.length} transaksi`);
-                } else {
+                                // Tampilkan di UI
+                    updateSummaryUI();
+                    console.log(appData.summary);
+                    console.log(`Data riwayat berhasil dimuat: ${allTransactions.length} transaksi`);} else {
                     throw new Error(data.error || 'Gagal memuat data');
                 }
                 
             } catch (error) {
                 console.error('Error loading transaction data:', error);
-                alert('Gagal memuat data riwayat: ' + error.message);
+                // alert('Gagal memuat data riwayat: ' + error.message);
                 
                 emptyState.style.display = 'block';
             } finally {
                 tableLoader.style.display = 'none';
             }
         }
+
+     // update ui
+    function updateSummaryUI() {
+        if (!appData.summary) return;
+
+
+        const summary = appData.summary || {
+        total_credit_bulan: 0,
+        total_debit_bulan: 0,
+        total_saldo: 0
+    };
+        const creditEl = document.getElementById('totalKeluar');
+        const debitEl = document.getElementById('totalMasuk');
+        const saldoEl = document.getElementById('totalSaldo');
+        if (creditEl) creditEl.textContent = formatCurrency(summary.total_credit_bulan);
+        if (debitEl) debitEl.textContent = formatCurrency(summary.total_debit_bulan);
+        if (saldoEl) saldoEl.textContent = formatCurrency(summary.total_saldo);
+}       
         
     function calculateTotals() {
     if (allTransactions.length === 0) return;
+    // // ✅ Ambil saldo terakhir dari transaksi TERAKHIR
+    // const lastTransaction = allTransactions[allTransactions.length - 1];
+    // // const totalSaldo = parseCurrency(lastTransaction.balance || 0);
+    
+    // // Hitung total debit & kredit
+    // let totalDebet = 0;
+    // let totalKredit = 0;
+    // allTransactions.forEach(transaction => {
+    //     totalDebet += parseCurrency(transaction.debit || '0');
+    //     totalKredit += parseCurrency(transaction.credit || '0');
+    // });
+
+    // // Simpan ke variabel global (jika perlu diakses di luar)
+    // window.appData = window.appData || {};
+    // window.appData.totalDebet = totalDebet;
+    // window.appData.totalKredit = totalKredit;
 
     // --- Helper Functions (nested) ---
     function safeDivide(dividend, divisor) {
@@ -1413,29 +1461,44 @@
         if (el) el.textContent = value;
     }
 
-    // --- Hitung Data ---
-    const lastTransaction = allTransactions[0];
-    const saldoTerakhir = lastTransaction?.balance || balance ;
-    console.log('Saldo terakhir:', saldoTerakhir);
+    // // --- Hitung Data ---
+    // const lastTransaction = allTransactions[0];
+    // const saldo = allTransactions[1];
+    // console.log('all transaksi:', allTransactions);
+    // const saldoTerakhir = lastTransaction?.balance || balance ;
+    // // console.log(typeof'Saldo terakhir:', saldo?.balance);
 
-    let totalDebet = 0;
-    let totalKredit = 0;
+    // let totalDebet = 0;
+    // let totalKredit = 0;
+    // let saldoFinal =  0;
 
-    allTransactions.forEach(transaction => {
-        totalDebet += parseCurrency(transaction?.debit || 0);
-        totalKredit += parseCurrency(transaction?.credit || 0);
-    });
+    // allTransactions.forEach(transaction => {
+    //     totalDebet += parseCurrency(transaction?.debit || 0);
+    //     totalKredit += parseCurrency(transaction?.credit || 0);
+    //     console.log('Total Debet sementara:', totalDebet);
+    //     saldoFinal += parseCurrency(totalDebet || 0);
+    //     saldoFinal -= parseCurrency(totalKredit || 0);   
+    //     console.log('Saldo terakhir ditampilkan:', saldoFinal)
+    // });
 
+   
 
-    // --- Update UI ---
-    const saldoElement = document.getElementById('totalSaldo'); 
-    if (saldoElement) {
-        // saldoElement.textContent = formatCurrency(saldoTerakhir);
-        saldoElement.textContent = saldoTerakhir
-    }   
-    updateElement('totalMasuk', totalDebet);
-    updateElement('totalKeluar', totalKredit);
-    updateText('totalTransaksi', allTransactions.length);
+    // const saldoElement = document.getElementById('totalSaldo'); 
+    // if (saldoElement) {
+    //     for (const transaksi of allTransactions) {
+            
+    //     };
+    //         // saldoElement.textContent = formatCurrency(saldoTerakhir);
+    //         // saldoFinal += saldoTerakhir
+    //         // console.log(typeof'Saldo final:', saldoFinal);
+    //         saldoElement.textContent = saldoFinal;
+    //     }   
+    // updateElement('totalSaldo', saldo.total_saldo);
+    // updateElement('totalMasuk', totalDebet);
+    // updateElement('totalKeluar', totalKredit);
+    // updateText('totalTransaksi', allTransactions.length);
+
+   
 
     // const debetCount = allTransactions.filter(t => parseCurrency(t.debit) > 0).length;
     // const kreditCount = allTransactions.filter(t => parseCurrency(t.credit) > 0).length;

@@ -791,7 +791,7 @@
     
     // Load saldo dari database
     async function loadUserSaldo() {
-    const API_GET_SALDO = '/api_get_saldo/'; // trailing slash sesuai route Flask
+    const API_GET_SALDO = `/api_get_saldo?username=${encodeURIComponent(username)}` ; // trailing slash sesuai route Flask
 
     // Opsional: pastikan saldoElement ada
     const saldoElement = document.querySelector('.saldo-amount');
@@ -867,7 +867,7 @@
         const keteranganS = keteranganSaldo.value.trim();
         
         // validasi
-        if (!jumlahS || jumlahS < 1000) {
+    if (!jumlahS || isNaN(jumlahS) || jumlahS < 1000) {
             showNotification('Masukkan jumlah yang valid (minimal Rp 1.000)', 'error');
             jumlahSaldo.focus();
             return;
@@ -935,10 +935,10 @@
     // Process Tambah Kredit dengan SAVE ke database
     async function prosesTambahKredit() {
 
-        console.log('=== DEBUG TAMBAH SALDO ===');
+        console.log('=== DEBUG TAMBAH KREDIT ===');
         console.log('1. Username:', username);
         console.log('2. Jumlah:', jumlahKredit.value);
-        console.log('3. API URL:', '/api_tambah_saldo/');
+        console.log('3. API URL:', '/api_tambah_kredit/');
 
         const jumlahK = parseInt(jumlahKredit.value);
         const keteranganK = keteranganKredit.value.trim();
@@ -959,7 +959,7 @@
         
         try {
             // Kirim data ke backend/database
-            const response = await fetch('/api_tambah_kredit/', {
+            const response = await fetch('/api_tambah_kredit', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

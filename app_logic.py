@@ -657,6 +657,10 @@ def tambah_saldo_page():
 @app.route('/api_get_saldo/', methods=['GET'])
 def api_get_saldo():
     """API untuk ambil saldo terakhir dan summary transaksi bulan ini"""
+    username = request.args.get('username')
+    
+    if not username:
+        return jsonify({'error': 'Parameter username tidak ada'}), 400
     
     try:
             # Koneksi ke database
@@ -674,7 +678,7 @@ def api_get_saldo():
             """)
             
             result = cursor.fetchone()
-            saldo_terakhir = result[0] if result else 0
+            saldo_terakhir = float(result[0]) if result else 0
 
             # Query summary transaksi bulan ini (semua user)
             cursor.execute("""
@@ -684,7 +688,7 @@ def api_get_saldo():
                 FROM tabungan.tabungan
                 WHERE DATE_TRUNC('month', datee) = DATE_TRUNC('month', CURRENT_DATE)
             """)
-            
+
             summary_result = cursor.fetchone()
             total_debit_bulan = summary_result[0] if summary_result else 0
             total_credit_bulan = summary_result[1] if summary_result else 0
@@ -714,10 +718,10 @@ def api_get_saldo():
 def api_tambah_saldo():
     """API untuk tambah saldo"""
 
-    if 'username' not in session:
-        return jsonify({'error': 'Silahkan logi terlebih dahulu'}), 401
+
     if not request.is_json:
         return jsonify({"error": "Request harus berupa JSON"}), 400
+    
     data = request.get_json()
     jumlah = data.get('jumlah')
     keterangan = data.get('keterangan', '')
@@ -725,7 +729,6 @@ def api_tambah_saldo():
     # validasi
     if not jumlah or not keterangan:
         return jsonify({'error': 'Jumlah dan keterangan harus diisi!'}), 400
-    
     try:
         jumlah = int(jumlah)
         if jumlah < 1000:
@@ -734,11 +737,11 @@ def api_tambah_saldo():
         return jsonify({'error': 'Jumlah harus berupa angka '}), 400
     
     # proses penambahan ke database
-    connection = connect_db()
-    if connection is None:
-        return jsonify({'error': 'Koneksi database gagal!1'}), 500
     
     try:
+        connection = connect_db()
+        if connection is None:
+            return jsonify({'error': 'Koneksi database gagal!1'}), 500
         cursor = connection.cursor()
 
         # ambil nomer transaksi paling akhir | logic idx
@@ -750,10 +753,9 @@ def api_tambah_saldo():
         # pilih lalu ambil 1 baris saldo paling akhir
         cursor.execute("""
         SELECT balance FROM tabungan.tabungan 
-        WHERE username = %s
         ORDER BY no DESC
         LIMIT 1
-""", (session['username'],))
+""")
         result = cursor.fetchone()
         saldo_terakhir = result[0] if result else 0
 
@@ -761,7 +763,7 @@ def api_tambah_saldo():
         # hitung saldo baru
         saldo_baru = saldo_terakhir + jumlah
         tanggal = datetime.now().strftime('%Y-%m-%d')
-
+ 
         # insert  atau simpan transaksi
         insert_query = """
         INSERT INTO tabungan.tabungan
@@ -983,14 +985,12 @@ def tambah_kredit_page():
 @app.route('/api_tambah_kredit/', methods=['POST'])
 def api_tambah_kredit():
     """API untuk tambah kredit"""
-
-    if 'username' not in session:
-        return jsonify({'error': 'Silahkan logi terlebih dahulu'}), 401
-    if not request.is_json:
-        return jsonify({"error": "Request harus berupa JSON"}), 400
     data = request.get_json()
     jumlah = data.get('jumlah')
     keterangan = data.get('keterangan', '')
+
+    if not request.is_json:
+        return jsonify({"error": "Request harus berupa JSON"}), 400
 
     # validasi
     if not jumlah or not keterangan:
@@ -1020,10 +1020,9 @@ def api_tambah_kredit():
         # pilih lalu ambil 1 baris saldo paling akhir
         cursor.execute("""
         SELECT balance FROM tabungan.tabungan 
-        WHERE username = %s
         ORDER BY no DESC
         LIMIT 1
-""", (session['username'],))
+""")
         result = cursor.fetchone()
         saldo_terakhir = result[0] if result else 0
 
@@ -1046,7 +1045,8 @@ def api_tambah_kredit():
         return jsonify({
             'success': True,
             'message': f'Berhasil menambahkan kredit sebesar Rp {jumlah:,}',
-            'saldo_baru' : saldo_baru
+            'saldo_baru' : saldo_baru,
+            'resul_baris_akhir': result[0]
         })
     
 
@@ -1150,12 +1150,12 @@ def api_get_transaksi():
 
         cursor = connection.cursor()
 
-        # Query untuk mendapatkan semua transaksi dari semua user (tabungan bersama)
+        # Query untuk menampilkan semua transaksi dari semua user (tabungan bersama)
         cursor.execute("""
             SELECT no, datee, debit, credit, balance, information, username
             FROM tabungan.tabungan
             ORDER BY no DESC
-        """)
+        """,)
 
         transactions = cursor.fetchall()
 
@@ -1170,7 +1170,7 @@ def api_get_transaksi():
                 'credit': f"Rp {row[3]:,}" if row[3] and row[3] > 0 else '-',
                 'balance': f"Rp {row[4]:,}" if row[4] else 'Rp 0',
                 'information': row[5] or '-',
-                'username': row [6] if row[6] else session.get('username', 'Unknown')
+                'username': row [6] if row[6] else session.get('username')
             })
 
         # Query untuk total debit dan credit bulan ini (semua user)
@@ -1180,7 +1180,7 @@ def api_get_transaksi():
                 COALESCE(SUM(credit), 0) as total_credit
             FROM tabungan.tabungan
             WHERE DATE_TRUNC('month', datee) = DATE_TRUNC('month', CURRENT_DATE)
-        """)
+        """,)
 
         summary_result = cursor.fetchone()
         total_debit_bulan = summary_result[0] if summary_result else 0
@@ -1191,11 +1191,11 @@ def api_get_transaksi():
                 SELECT balance FROM tabungan.tabungan
                 ORDER BY no DESC
                 LIMIT 1
-            """)
+            """,)
 
         result = cursor.fetchone()
         saldo_terakhir = result[0] if result else 0
-
+        # saldo_terakhir = total_debit_bulan - total_credit_bulan
 
         return jsonify({
             'success': True,
@@ -1203,7 +1203,7 @@ def api_get_transaksi():
             'summary': {
                 'total_debit_bulan': total_debit_bulan,
                 'total_credit_bulan': total_credit_bulan,
-                'total-saldo': saldo_terakhir
+                'total_saldo': saldo_terakhir
             }
         }), 200
         
