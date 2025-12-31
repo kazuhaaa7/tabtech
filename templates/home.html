@@ -131,7 +131,7 @@
             color: white;
             border-radius: 50%;
             font-weight: 600;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             margin-right: 20px;
             flex-shrink: 0;
         }
@@ -139,8 +139,20 @@
         .menu-content {
             flex-grow: 1;
         }
+        
+        .menu-title{
+            font-size: 1.3rem;
+            font-weight: 600;   
+        }
+        .content-subtitle{
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 1rem;
+            margin-bottom: 30px;
+        }
 
-        .menu-title {
+        .content-title {
+            text-align: center;
             font-size: 1.3rem;
             font-weight: 600;
             color: #2c3e50;
@@ -255,14 +267,16 @@
         
         <div class="card">
             <div class="card-header">
-                TABUNGAN SEDERHANA
+                HALAMAN MENU
             </div>
             
             <div class="menu">
+                <div class="content-title">Pilih menu yang Anda butuhkan</div>
+                <div class="content-subtitle">Gunakan username dan password yang sudah terdaftar</div>
                 <div class="menu-item" id="menu1">
                     <div class="menu-number">1</div>
                     <div class="menu-content">
-                        <div class="menu-title">Login</div>
+                        <div class="menu-title">Masuk</div>
                         <div class="menu-desc">Masuk ke akun Anda yang sudah terdaftar</div>
                     </div>
                     <div class="menu-icon">
@@ -274,7 +288,7 @@
                     <div class="menu-number">2</div>
                     <div class="menu-content">
                         <div class="menu-title">Registrasi</div>
-                        <div class="menu-desc">Buat akun baru untuk mulai menabung</div>
+                        <div class="menu-desc">Buat akun baru </div>
                     </div>
                     <div class="menu-icon">
                         <i class="fas fa-user-plus"></i>
@@ -285,7 +299,7 @@
                     <div class="menu-number">3</div>
                     <div class="menu-content">
                         <div class="menu-title">Keluar</div>
-                        <div class="menu-desc">Keluar dari aplikasi Tabungan Sederhana</div>
+                        <div class="menu-desc">Keluar dari aplikasi</div>
                     </div>
                     <div class="menu-icon">
                         <i class="fas fa-sign-out-alt"></i>
@@ -312,17 +326,18 @@
         </div>
         
         <div class="footer">
-            <p>&copy; 2023 Tabungan Sederhana. Semua hak dilindungi.</p>
+            <p> Inget budgeting ya para user...</p>
         </div>
     </div>
 
     <script>
+        // memanggil id untuk dijalankan di js 
         document.addEventListener('DOMContentLoaded', function() {
             const menuItems = document.querySelectorAll('.menu-item');
             const menuInput = document.getElementById('menuInput');
             const submitBtn = document.getElementById('submitBtn');
             
-            // Efek klik pada menu item
+            // Efek klik pada menu item || Kode ini membuat setiap item menu (misal: tombol/tulisan menu) menjadi klikable.
             menuItems.forEach(item => {
                 item.addEventListener('click', function() {
                     const menuNumber = this.querySelector('.menu-number').textContent;
@@ -362,25 +377,26 @@
                 });
                 
                 // Validasi input
-                if (!menuNumber || menuNumber < 1 || menuNumber > 3) {
+                if (!menuNumber || menuNumber < 1 || menuNumber >= 3) {
                     alert('Masukkan pilihan yang valid (1-3)');
                     menuInput.focus();
                     return;
                 }
                 
                 // Highlight menu yang dipilih
-                const selectedItem = document.getElementById(`menu${menuNumber}`);
-                selectedItem.style.backgroundColor = '#e1f5fe';
-                selectedItem.style.borderColor = '#3a7bd5';
+                // const selectedItem = document.getElementById(`menu${menuNumber}`);
+                // selectedItem.style.backgroundColor = '#e1f5fe';
+                // selectedItem.style.borderColor = '#3a7bd5';
                 
-                // Animasi konfirmasi
-                selectedItem.style.transform = 'scale(1.02)';
-                setTimeout(() => {
-                    selectedItem.style.transform = 'scale(1)';
-                }, 200);
+                // // Animasi konfirmasi
+                // selectedItem.style.transform = 'scale(1.02)';
+                // setTimeout(() => {
+                //     selectedItem.style.transform = 'scale(1)';
+                // }, 1000);
                 
                 // Tampilkan pesan berdasarkan pilihan
                 let message = '';
+                // => alternatif lain pake switch untuk pindah halaman
                 // switch(menuNumber) {
                 //     case '1':
                 //         window.location.href = '/login/';
@@ -396,26 +412,32 @@
                 // }
 
                 if (menuNumber === '1'){
-                    window.location.href = '/login/';
+                    setTimeout(()=>{
+                        window.location.href = '/login/';
+
+                    }, 1000)
                 } else if (menuNumber === '2'){
-                    window.location.href = '/menu_registrasi/';
+                    setTimeout(()=>{
+                        window.location.href = '/menu_registrasi/';
+                    }, 1000)
                 } else if (menuNumber === '3'){
-                    window.location.href = '/logout';
+                    setTimeout(()=>{
+                        window.location.href = '/logout';
+                    }, 1000)
                 }
                 
-                // Tampilkan alert
-                setTimeout(() => {
-                    alert(message);
+                // // Tampilkan alert
+                // setTimeout(() => {
+                //     alert(message);
                     
-                    // Reset input setelah dipilih
-                    menuInput.value = '';
-                    
-                    // Reset highlight setelah beberapa detik
-                    setTimeout(() => {
-                        selectedItem.style.backgroundColor = '#f8f9fa';
-                        selectedItem.style.borderColor = 'transparent';
-                    }, 1000);
-                }, 300);
+                //     // Reset input setelah dipilih
+                //     // menuInput.value = '';
+                //     // Reset highlight setelah beberapa detik
+                //     // setTimeout(() => {
+                //     //     selectedItem.style.backgroundColor = '#f8f9fa';
+                //     //     selectedItem.style.borderColor = 'transparent';
+                //     // }, 1000);
+                // }, 300);
             }
             
             // Fokus ke input field saat halaman dimuat

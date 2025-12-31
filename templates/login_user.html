@@ -26,7 +26,7 @@
 
         .container {
             width: 100%;
-            max-width: 500px;
+            max-width: 600px;
             margin: 0 auto;
         }
 
@@ -51,6 +51,34 @@
             margin: 0 auto;
         }
 
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px 30px;
+            background: white;
+            color: #2c3e50;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 1001;
+            animation: slideInRight 0.3s ease;
+            border-left: 5px solid #27ae60;
+            max-width: 400px;
+            font-family: 'Poppins', sans-serif;
+        }
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .notification-icon {
+            font-size: 1.8rem;
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
         .card {
             background-color: white;
             border-radius: 20px;
@@ -358,58 +386,48 @@
             font-size: 0.9rem;
         }
 
-        .notificationSuccess {
+        /* Notification */
+        .notification {
             position: fixed;
             top: 20px;
             right: 20px;
             padding: 20px 30px;
-            background: white;
-            color: #2c3e50;
+            color:white;
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
             display: none;
-            z-index: 1000;
-            animation: slideInRight 0.5s ease;
-            border-left: 5px solid #27ae60;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: opacity 3s ease, transform 3s ease;
+            z-index: 1001;
             max-width: 400px;
+            pointer-events: none; /* non-interaktif saat tersembunyi */
         }
-
-        .notificationSuccess.error {
-            border-left-color: #e74c3c;
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
         }
-
-        .notificationSuccess.warning {
-            border-left-color: #f39c12;
+        .notification.warning {
+            background-color: #f39c12;
+            
         }
-
-        .notificationError {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 20px 30px;
-            background: white;
-            color: #2c3e50;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            display: none;
-            z-index: 1000;
-            animation: slideInRight 0.5s ease;
-            border-left: 5px solid #e74c3c;
-            max-width: 400px;
+        .notification.error {
+            background-color: #e74c3c;
         }
-
-        .notificationError.error {
-            border-left-color: #e74c3c;
+        
+        .notification.success {
+            background-color: #27ae60;
         }
-
-        /* .notificationSuccess.warning {
-            border-left-color: #f39c12;
-        } */
-
-        @keyframes slideInRight {
+        
+        /* @keyframes slideInRight {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1;}
+            to {transform: translateX(100%) opacity 0;}
+        } */
 
         .notification-header {
             display: flex;
@@ -422,21 +440,21 @@
             font-size: 1.8rem;
         }
 
-        .notificationSuccess.success .notification-icon {
-            color: #27ae60;
+        .notification.succes .notification-icon {
+            color: white;
         }
 
-        .notificationError .notification-icon {
-            color: #e74c3c;
+        .notification.error.notification-icon {
+            color: white;
+        }
+        .notification.warning .notification-icon  {
+            color: white;
         }
 
-        .notification-title {
-            font-weight: 600;
-            font-size: 1.2rem;
-        }
 
         .notification-message {
-            font-size: 1rem;
+            font-weight: 600;
+            font-size: 1.2rem;
             line-height: 1.5;
         }
 
@@ -463,18 +481,20 @@
             .form-actions {
                 flex-direction: column;
             }
-            
-            .notification {
-                left: 20px;
-                right: 20px;
-                max-width: none;
-            }
+
         }
     </style>
 </head>
 <body>
-    <!-- Notification -->
-    <div id="notificationSuccess" class="notificationSuccess">
+    Notification
+     <div class="notification" id="notification">
+        <div class="notification-header">
+        <i class="fas fa-check-circle notification-icon"></i>
+        <div class="notification-message" id="notificationMessage"></div>
+    </div>
+     </div>
+
+    <!-- <div id="notificationSuccess" class="notificationSuccess">
         <div class="notification-header">
             <i class="fas fa-check-circle notification-icon"></i>
             <div class="notification-title">Login Berhasil!</div>
@@ -491,7 +511,7 @@
         <div class="notification-message" id="notificationMessageError">
             Anda akan dialihkan ke menu utama
         </div>
-    </div>
+    </div> -->
     
     <div class="container">
         <div class="header">
@@ -501,7 +521,7 @@
         
         <div class="card">
             <div class="card-header">
-                LOGIN
+                HALAMAN VERIFIKASI
             </div>
             
             <div class="login-container">
@@ -582,7 +602,7 @@
         </div>
         
         <div class="footer">
-            <p>&copy; 2024 Tabungan Sederhana. Halaman Login.</p>
+            <p>Inget budgeting ya para user...</p>
         </div>
     </div>
 
@@ -593,15 +613,21 @@
         const togglePasswordBtn = document.getElementById('togglePassword');
         const submitBtn = document.getElementById('submitBtn');
         const loginForm = document.getElementById('loginForm');
-        const errorMessage = document.getElementById('errorMessage');
-        const errorMessageText = document.getElementById('errorMessageText');
-        const successMessage = document.getElementById('successMessage');
-        const successMessageText = document.getElementById('successMessageText');
-        const notificationSucces = document.getElementById('notificationSucces');
-        const notificationError = document.getElementById('notificationError');
-        const notificationMessageSuccess = document.getElementById('notificationMessageSuccess');
-        const notificationMessageError = document.getElementById('notificationMessageError');
+        // const errorMessage = document.getElementById('errorMessage');
+        // const errorMessageText = document.getElementById('errorMessageText');
+        // const successMessage = document.getElementById('successMessage');
+        // const successMessageText = document.getElementById('successMessageText');
+        // const notificationSucces = document.getElementById('notificationSucces');
+        // const notificationError = document.getElementById('notificationError');
+        // const notificationMessageSuccess = document.getElementById('notificationMessageSuccess');
+        // const notificationMessageError = document.getElementById('notificationMessageError');
+        const notification = document.getElementById('notification');
+        const notificationMessage = document.querySelector('.notification-message');
+        const notificationIcon = document.querySelector('.notification-icon');
         const loader = document.getElementById('loader');
+
+
+        showNotification(`Wellcome in menu login`, 'info');
         
         // Toggle password visibility | ikon mata | mengizinkan user untuk melihat/menyembunyikan password
         let isPasswordVisible = false;
@@ -612,120 +638,161 @@
                 '<i class="fas fa-eye-slash"></i>' : 
                 '<i class="fas fa-eye"></i>';
         }); 
-    
-        // Show error message | Menampilkan notifikasi pesan error
-        function showError(message) {
-            errorMessageText.textContent = message;  // Set pesan error
-            errorMessage.style.display = 'flex';  // Tampilkan container error
-            successMessage.style.display = 'none';  // Sembunyikan success message
+        function showNotification(message, type = 'succes'){
+            if (!notification) {
+                console.warn('Elemen notifikasi tidak ditemukan!');
+                return;
+            }
+            // set message
+            notificationMessage.textContent = message
             
-            // Add error class to inputs
-            usernameInput.classList.add('error'); 
-            passwordInput.classList.add('error');
-            
-            // Auto hide after 5 seconds
-            setTimeout(() => {
-                errorMessage.style.display = 'none';
-                usernameInput.classList.remove('error');
-                passwordInput.classList.remove('error');
-            }, 5000);
-        }
-        
+            // reset class, replace sesuai type
+            notification.className = 'notification'
+            notification.classList.add(type, 'show');
 
-        function showErrorMessage(username, role){
-            showError(message)
-        }
-
-         // Show notification error| Sistem notifikasi fleksibel
-        function showNotificationError(message, type = 'error', role = '') {
-            notificationMessageError.innerHTML = message;
-            
-            // Update notification type
-            notificationError.className = 'notificationError ' + type;
-            const icon = notificationError.querySelector('.notification-icon');
-            if (type === 'error') {
-                icon.className = 'fas fa-exclamation-circle notification-icon';
+             // Ubah ikon & warna border sesuai tipe
+            if (type === 'success') {
+                notificationIcon.className = 'fas fa-check-circle notification-icon';
+                notification.style.backgroundColor = '#27ae60';
+            } else if (type === 'error') {
+                notificationIcon.className = 'fas fa-exclamation-circle notification-icon';
+                notification.style.backgroundColor = '#e74c3c';
             } else if (type === 'warning') {
-                icon.className = 'fas fa-exclamation-triangle notification-icon';
-            }
-            // Show notification
-            notificationError.style.display = 'block'; // Tampilkan notifikasi
-            
-            // Auto hide after 3 seconds
-            setTimeout(() => {
-                notificationError.style.display = 'none';
-            }, 2500);
-        }
-        
-
-
-        // Show success message | Menampilkan notifikasi pesan success
-        function showSuccess(username, role) {
-            const nama = usernameInput.value;
-            console.log('role ku',role)
-
-
-            
-            // Buat badge untuk role
-            let roleBadge;
-            if (role === 'User Tabungan') {
-                roleBadge = '<span class="role-badge role-user">User Tabungan</span>';
-            } else if (role === 'admin') {
-                roleBadge = '<span class="role-badge role-admin">Admin</span>';
+                notificationIcon.className = 'fas fa-exclamation-triangle notification-icon';
+                notification.style.backgroundColor = '#f39c12';
             } else {
-                roleBadge = `<span class="role-badge">${role}</span>`;
+                // default / info
+                notificationIcon.className = 'fas fa-info-circle notification-icon';
+                notification.style.backgroundColor = '#3498db';
             }
 
-            successMessageText.innerHTML = `WELLCOME <strong>${username}</strong> sebagai <strong>${role}</strong> <br>Login berhasil!`;
-            successMessage.style.display = 'flex';  // Tampilkan container
-            errorMessage.style.display = 'none'; // Sembunyikan error
-
+            // Tampilkan
+            notification.style.display = 'block';
             
-            // Add success class to inputs
-            usernameInput.classList.add('success'); 
-            passwordInput.classList.add('success');
+            // Sembunyikan otomatis setelah delay
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    
+                    // Opsional: benar-benar sembunyikan setelah animasi selesai
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                    }, 100); // sesuaikan dengan durasi transisi
+                }, type === 'success' ? 1000 : 2000); 
+            }   
 
+        // // Show error message | Menampilkan notifikasi pesan error
+        // function showError(message) {
+        //     errorMessageText.textContent = message;  // Set pesan error
+        //     errorMessage.style.display = 'flex';  // Tampilkan container error
+        //     successMessage.style.display = 'none';  // Sembunyikan success message
             
-        }
+        //     // Add error class to inputs
+        //     usernameInput.classList.add('error'); 
+        //     passwordInput.classList.add('error');
+            
+        //     // Auto hide after 5 seconds
+        //     setTimeout(() => {
+        //         errorMessage.style.display = 'none';
+        //         usernameInput.classList.remove('error');
+        //         passwordInput.classList.remove('error');
+        //     }, 3000);
+        // }
         
-        function showSuccessMessage(username, role){
-            showSuccess(message)
-        }
+
+        // function showErrorMessage(username, role){
+        //     showError(message)
+        // }
+
+        //  // Show notification error| Sistem notifikasi fleksibel
+        // function showNotificationError(message, type = 'error', role = '') {
+        //     notificationMessageError.innerHTML = message;
+            
+        //     // Update notification type
+        //     notificationError.className = 'notificationError ' + type;
+        //     const icon = notificationError.querySelector('.notification-icon');
+        //     if (type === 'error') {
+        //         icon.className = 'fas fa-exclamation-circle notification-icon';
+        //     } else if (type === 'warning') {
+        //         icon.className = 'fas fa-exclamation-triangle notification-icon';
+        //     }
+        //     // Show notification
+        //     notificationError.style.display = 'block'; // Tampilkan notifikasi
+            
+        //     // Auto hide after 3 seconds
+        //     setTimeout(() => {
+        //         notificationError.style.display = 'none';
+        //     }, 3000);
+        // }
+        
+
+
+        // // Show success message | Menampilkan notifikasi pesan success
+        // function showSuccess(username, role) {
+        //     const nama = usernameInput.value;
+        //     console.log('role ku',role)
+
+
+            
+        //     // Buat badge untuk role
+        //     let roleBadge;
+        //     if (role === 'User Tabungan') {
+        //         roleBadge = '<span class="role-badge role-user">User Tabungan</span>';
+        //     } else if (role === 'admin') {
+        //         roleBadge = '<span class="role-badge role-admin">Admin</span>';
+        //     } else {
+        //         roleBadge = `<span class="role-badge">${role}</span>`;
+        //     }
+
+        //     successMessageText.innerHTML = `WELLCOME <strong>${username}</strong> sebagai <strong>${role}</strong> <br>Login berhasil!`;
+        //     successMessage.style.display = 'flex';  // Tampilkan container
+        //     errorMessage.style.display = 'none'; // Sembunyikan error
+
+            
+        //     // Add success class to inputs
+        //     usernameInput.classList.add('success'); 
+        //     passwordInput.classList.add('success');
+
+            
+        // }
+        
+        // function showSuccessMessage(username, role){
+        //     showSuccess(message)
+        // }
 
         // Show notification sukses| Sistem notifikasi fleksibel
-        function showNotificationSuccess(message, type = 'success', role = '') {
-            notificationMessageSuccess.innerHTML = message;
+        // function showNotificationSuccess(message, type = 'success', role = '') {
+        //     notificationMessageSuccess.innerHTML = message;
             
-            // Update notification type
-            notificationSuccess.className = 'notificationSuccess ' + type;
-            const icon = notificationSuccess.querySelector('.notification-icon');
+        //     // Update notification type
+        //     notificationSuccess.className = 'notificationSuccess ' + type;
+        //     const icon = notificationSuccess.querySelector('.notification-icon');
             
-            if (type === 'success') {
-                icon.className = 'fas fa-check-circle notification-icon';
-                if (role === 'User Tabungan') {
-                    notificationMessageSuccess.innerHTML += '<br>Mengarahkan ke Menu User...';
-                } else if (role === 'admin') {
-                    notificationMessageSuccess.innerHTML += '<br>Fitur Admin dalam perbaikan...';
-                }
-            } else if (type === 'error') {
-                icon.className = 'fas fa-exclamation-circle notification-icon';
-            } else if (type === 'warning') {
-                icon.className = 'fas fa-exclamation-triangle notification-icon';
-            }
+        //     if (type === 'success') {
+        //         icon.className = 'fas fa-check-circle notification-icon';
+        //         if (role === 'User Tabungan') {
+        //             notificationMessageSuccess.innerHTML += '<br>Mengarahkan ke Menu User...';
+        //         } else if (role === 'admin') {
+        //             notificationMessageSuccess.innerHTML += '<br>Fitur Admin dalam perbaikan...';
+        //         }
+        //     } else if (type === 'error') {
+        //         icon.className = 'fas fa-exclamation-circle notification-icon';
+        //     } else if (type === 'warning') {
+        //         icon.className = 'fas fa-exclamation-triangle notification-icon';
+        //     }
             
-            // Show notification
-            notificationSuccess.style.display = 'block'; // Tampilkan notifikasi
+        //     // Show notification
+        //     notificationSuccess.style.display = 'block'; // Tampilkan notifikasi
             
-            // Auto hide after 3 seconds
-            setTimeout(() => {
-                notificationSuccess.style.display = 'none';
-            }, 2500);
-        }
+        //     // Auto hide after 3 seconds
+        //     setTimeout(() => {
+        //         notificationSuccess.style.display = 'none';
+        //     }, 2500);
+        // }
 
 
         // Go back to home
         function goBackToHome() {
-                showNotificationError('Akan kembali ke halaman home!', 'warning');
+                showNotification('kembali ke halaman home!', 'warning');
 
             // Clear form
             loginForm.reset();
@@ -743,20 +810,22 @@
         // Form submission memeriksa user n pw
         loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
+           
             
             const username = usernameInput.value.trim().toLowerCase();
             const password = passwordInput.value.trim();
+
             
             // Validation
             if (username === '') {
-                showError('Username tidak boleh kosong');
+                showNotification('Username tidak boleh kosong', 'warning');
                 usernameInput.focus();
                 return; // Hentikan eksekusi
             }
 
             // Check if user wants to go back | recom: ganti icon
             if (username === '1') {
-                showError('Anda akan diarahkan ke halaman home')
+                showNotification('Anda akan diarahkan ke halaman home', 'warning')
                 usernameInput.focus();
                 setTimeout(()=> {
                     window.location.href = '/';
@@ -766,7 +835,7 @@
             }
             
             if (password === '') {
-                showError('Password tidak boleh kosong');
+                showNotification('Password tidak boleh kosong', 'error');
                 passwordInput.focus();
                 return;
             }
@@ -823,8 +892,7 @@
 
                 if (result.success) {
                     // Tampilkan pesan sukses
-                    showSuccess(result.username, result.role);
-                    showNotificationSuccess(result.message || 'Login berhasil', 'success', result.role);
+                    showNotification(result.message, 'success' || 'Login berhasil', 'success');
                     
                     // Redirect based on role
                     // Tentukan URL redirect - PRIORITAS:
@@ -869,7 +937,6 @@
                 } else {
                      // Login failed
                     const errorMsg = result.error || result.message || 'Login gagal!';
-                    showError(errorMsg);
                     showNotification(errorMsg, 'error');
                     
                     // Clear password field
@@ -881,8 +948,7 @@
                  // Tampilkan error ke user
                 console.error('Login error:', error);
                 const errorMsg = error.message || 'Terjadi kesalahan saat login. Silakan coba lagi.';
-                showError(errorMsg);
-                showNotificationError(errorMsg, 'error');
+                showNotification(errorMsg, 'error');
 
 
                 // Clear password field on error
