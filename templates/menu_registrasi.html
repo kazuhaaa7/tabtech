@@ -558,8 +558,10 @@
                 case '1':
                     showNotification('Mengarahkan ke pendaftaran User Tabungan...', 'success');
                     setTimeout(() => {
-                        window.location.href = '/register_user';
-                    }, 1500);
+                        menuInput.focus()
+                        window.location.href = '/registrasi_user/';
+                        console.log('Navigasi ke /registrasi_user/');
+                    }, 800);
                     break;
                     
                 case '2':
@@ -572,8 +574,9 @@
                 case '3':
                     showNotification('Kembali ke menu utama...', 'info');
                     setTimeout(() => {
+                        menuInput.focus()
                         window.location.href = '/';
-                    }, 1000);
+                    }, 500);
                     break;
                     
                 default:

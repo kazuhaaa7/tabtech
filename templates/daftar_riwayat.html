@@ -1167,10 +1167,21 @@
                 if (filterType === 'credit' && parseCurrency(transaction.credit || '0') === 0) return false;
                 
                 // Apply search filter
-                if (searchTerm) {
-                    const searchInInfo = transaction.information.toLowerCase().includes(searchTerm);
-                    const searchInDate = transaction.datee.includes(searchTerm);
-                    const searchInAmount = formatCurrency(transaction.debit || transaction.credit).toLowerCase().includes(searchTerm);
+                if (searchTerm === 'user' && searchTerm){
+                    const username = (transaction.username || '').toLowerCase();
+                    if(!username.includes(searchTerm)) return false;
+                }
+                // --- Filter umum (berlaku untuk semua jenis, kecuali 'user') ---
+                if (searchTerm && filterType !== 'user') {
+                    const searchInInfo =( transaction.information || '').toLowerCase().includes(searchTerm);
+                    const searchInDate =(
+                    transaction.datee || '').includes(searchTerm);
+                    // format amount untuk pencarian
+                    const amountStr = formatCurrency(
+                        parseCurrency(transaction.debit || '0')|| 
+                        parseCurrency(transaction.credit || '0')
+                    ).toLocaleLowerCase();
+                    const searchInAmount = amountStr.includes(searchTerm);
                     
                     if (!(searchInInfo || searchInDate || searchInAmount)) return false;
                 }
@@ -1505,6 +1516,16 @@
 
     // updateElement('avgDebet', safeDivide(totalDebet, debetCount));
     // updateElement('avgKredit', safeDivide(totalKredit, kreditCount));
+
+    document.getElementById('filterType').addEventListener('change', function() {
+    const searchInput = document.getElementById('searchInput');
+    if (this.value === 'user') {
+        searchInput.placeholder = 'Cari nama user...';
+    } else {
+        searchInput.placeholder = 'Cari transaksi...';
+    }
+    filterTransactions(); // trigger ulang filter
+});
 
     if (allTransactions[0]?.tanggal) {
         // Pastikan formatDate tersedia

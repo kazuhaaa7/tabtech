@@ -81,7 +81,7 @@ def menu_registrasi():
 @app.route('/api/menu/', methods = ['POST'])
 def api_menu():
     """API untuk memproses pilihan menu"""
-    data =  request.get.json()
+    data =  request.get_json()
     pilihan = data.get('pilihan')
 
     if pilihan == '1':
@@ -186,11 +186,14 @@ def regisUserSavings():
     return render_template("registrasi_user.html")
 
 
-@app.route("/api/registrasi/type")  
+@app.route("/api_registrasi_user/", methods=['POST'])  
 def api_registrasi_user():
+    #  1. Validasi Content-Type
+    if not request.is_json:
+        return jsonify({'success': False, 'message': 'Content-Type must be application/json'}), 400
     """API untuk registrasi user baru"""
     data = request.get_json()
-    username = data.get('username').lower()      
+    username = data.get('username').lower().strip()  
     password = data.get('password').lower()  
 
     #validasi input
@@ -217,7 +220,7 @@ SELECT username
 FROM users.pengguna 
 WHERE username = %s
 """     
-        cursor.execute(check_query, (username))
+        cursor.execute(check_query, (username,))
         check_user = cursor.fetchone()
 
         if check_user:
@@ -235,7 +238,9 @@ WHERE username = %s
         return jsonify({
             'success' : True,
             'message' : f'Registrasi berhasil! Selamat datang {username}. Silahkan login...',
-            'redierect': '/menu_registrasi/'
+            'redierect': '/menu_registrasi/',
+            'username' : username,
+            'pasword' : password
         })
     
     except Error as error:
@@ -1322,6 +1327,40 @@ def get_username():
         'logged_in': username != 'User Tabungan'
     })
 
+@app.route("/api_check_username/", methods=['GET'])
+def api_check_username():
+    """API untuk mengecek status login"""
+    username  = request.args.get('username')
+    if not username:
+        return jsonify({'success': False,
+                        'message': 'ussername tidak diberikan'})
+
+    connection = connect_db()
+    if connection is None:
+        return jsonify({'success': False,
+                        'message': 'koneksi database gagal!'}), 500
+
+    try:
+        cursor = connection.cursor()
+        cursor.execute("""
+        SELECT username
+        FROM users.pengguna WHERE username = %s
+        """, (username,))
+        exists = cursor.fetchone() is not None
+        return jsonify({"success": not exists,
+                        'data': username if not exists else ''})
+
+
+    except Exception as e:
+        current_app.logger.error(f"Error cek username {str(e)}")
+        return jsonify({'success': False,
+                        'message': 'terjadi kesalahan server'}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
 # Pastikan endpoint ini ada dan benar
 
 
