@@ -121,6 +121,21 @@
             margin-bottom: 0;
         }
 
+        .menu-item::before{
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 5px;
+            background: linear-gradient(to bottom, #3a7bd5, #00d2ff);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .menu-item:hover::before {
+            opacity: 1;
+        }
         .menu-number {
             display: flex;
             justify-content: center;
@@ -189,14 +204,18 @@
         .input-container {
             display: flex;
             width: 100%;
-            max-width: 300px;
+            max-width: 450px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            gap: 10px;
         }
 
         .input-field {
             flex-grow: 1;
             padding: 15px 20px;
             border: 2px solid #ddd;
-            border-radius: 10px 0 0 10px;
+            border-radius: 10px;
             font-size: 1.1rem;
             font-family: 'Roboto Mono', monospace;
             transition: all 0.3s;
@@ -211,17 +230,24 @@
             background: linear-gradient(135deg, #3a7bd5, #2c3e50);
             color: white;
             border: none;
-            border-radius: 0 10px 10px 0;
+            border-radius:10px;
             padding: 0 25px;
             font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            flex-shrink: 0;
         }
 
         .input-btn:hover {
-            background: linear-gradient(135deg, #2c3e50, #3a7bd5);
+            /* background: linear-gradient(135deg, #2c3e50, #3a7bd5); */
+            transform: translateX(5px); /* ✅ Efek hover */
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.15);
         }
+        .input-btn:active {
+            transform: translateX(0); /* ✅ Efek klik */
+}
+
 
         .footer {
             text-align: center;
@@ -254,6 +280,35 @@
             
             .header h1 {
                 font-size: 2.2rem;
+            }
+            
+            .input-container {
+                flex-direction: column;
+            }
+
+            .input-field {
+                width: 100%;
+                border-radius: 12px 12px 0 0;
+            }
+
+            .input-btn {
+                width: 100%;
+                padding: 15px;
+                border-radius: 0 0 12px 12px;
+            }
+            .input-container {
+                flex-direction: column;
+            }
+
+            .input-field {
+                width: 100%;
+                border-radius: 12px 12px 0 0;
+            }
+
+            .input-btn {
+                width: 100%;
+                padding: 15px;
+                border-radius: 0 0 12px 12px;
             }
         }
     </style>
@@ -384,15 +439,15 @@
                 }
                 
                 // Highlight menu yang dipilih
-                // const selectedItem = document.getElementById(`menu${menuNumber}`);
-                // selectedItem.style.backgroundColor = '#e1f5fe';
-                // selectedItem.style.borderColor = '#3a7bd5';
+                const selectedItem = document.getElementById(`menu${menuNumber}`);
+                selectedItem.style.backgroundColor = '#e1f5fe';
+                selectedItem.style.borderColor = '#3a7bd5';
                 
                 // // Animasi konfirmasi
-                // selectedItem.style.transform = 'scale(1.02)';
-                // setTimeout(() => {
-                //     selectedItem.style.transform = 'scale(1)';
-                // }, 1000);
+                selectedItem.style.transform = 'scale(1.02)';
+                setTimeout(() => {
+                    selectedItem.style.transform = 'scale(1)';
+                }, 300);
                 
                 // Tampilkan pesan berdasarkan pilihan
                 let message = '';

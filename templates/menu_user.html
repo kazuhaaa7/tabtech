@@ -468,36 +468,49 @@
             background: #f8f9fa;
             color: #2c3e50;
         }
-
-        /* Notification */
+/* Notification */
         .notification {
             position: fixed;
             top: 20px;
             right: 20px;
             padding: 20px 30px;
-            background: white;
-            color: #2c3e50;
+            color:white;
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
             display: none;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: opacity 3s ease, transform 3s ease;
             z-index: 1001;
-            animation: slideInRight 0.3s ease;
-            border-left: 5px solid #27ae60;
             max-width: 400px;
+            font-weight: 500;
+            pointer-events: none; /* non-interaktif saat tersembunyi */
         }
-
+        .notification.show {
+            display: block;
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+        .notification.warning {
+            background-color: #f39c12;
+            border-left: 5px solid #f39c12;
+            
+        }
         .notification.error {
-            border-left-color: #e74c3c;
+            background-color: #e74c3c;
+            border-left: 5px solid #e74c3c;
         }
-        .notification.warning{
-            border-left-color:#f39c12 ;
-        }
+        
+        .notification.success {
+            background-color: #27ae60;
+            border-left: 5px solid #27ae60;
 
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
         }
+        .notification.info{
+            border-left: 5px solid #3498db;
 
+        }
         .notification-header {
             display: flex;
             align-items: center;
@@ -509,24 +522,21 @@
             font-size: 1.8rem;
         }
 
-        .notification.success .notification-icon {
-            color: #27ae60;
+        .notification.succes .notification-icon {
+            color: white;
         }
 
-        .notification.error .notification-icon {
-            color: #e74c3c;
+        .notification.error.notification-icon {
+            color: white;
         }
-        .notification.warning .notification-icon {
-            color: #f39c12;
+        .notification.warning .notification-icon  {
+            color: white;
         }
-        
-        .notification-title {
-            font-weight: 600;
-            font-size: 1.2rem;
-        }
+
 
         .notification-message {
-            font-size: 1rem;
+            font-weight: 600;
+            font-size: 1.2rem;
             line-height: 1.5;
         }
 
@@ -538,7 +548,7 @@
             font-size: 0.9rem;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 600px) {
             .navbar {
                 flex-direction: column;
                 gap: 20px;
@@ -593,9 +603,8 @@
     <div id="notification" class="notification">
         <div class="notification-header">
             <i class="fas fa-check-circle notification-icon"></i>
-            <div class="notification-title">Berhasil!</div>
+            <div class="notification-message" id="notificationMessage"></div>
         </div>
-        <div class="notification-message" id="notificationMessage"></div>
     </div>
 
     <!-- Tambah Saldo Modal -->
@@ -793,6 +802,9 @@
         const jumlahKredit = document.getElementById('jumlahKredit')
         const keteranganSaldo =  document.getElementById('keteranganSaldo')
         const jumlahSaldo = document.getElementById('jumlahSaldo')
+        const notification = document.getElementById('notification');
+        const notificationMessage = document.querySelector('.notification-message');
+        const notificationIcon = document.querySelector('.notification-icon');
         
 
         // Initialize page
@@ -1105,14 +1117,14 @@
                     showNotification('Membuka form Tambah Saldo...', 'success');
                     setTimeout(() => {
                         openModal('tambahSaldoModal');
-                    }, 500);
+                    }, 300);
                     break;
                     
                 case '2':
                     showNotification('Membuka form Tambah Kredit...', 'success');
                     setTimeout(() => {
                         openModal('tambahKreditModal');
-                    }, 500);
+                    }, 300);
                     break;
                     
                 case '3':
@@ -1121,14 +1133,14 @@
                       // Simpan username sebelum redirect
                     setTimeout(() => {
                         window.location.href = `/daftar_riwayat/`;
-                    }, 1000);
+                    }, 300);
                     break;
                     
                 case '5':
                     showNotification('Keluar dari menu...', 'success');
                     setTimeout(() => {
                         window.location.href = '/';
-                    }, 1000);
+                    }, 500);
                     break;
             }
             
@@ -1212,28 +1224,47 @@
         // }
         
         // Show notification
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            const notificationMessage = document.getElementById('notificationMessage');
-            
-            notificationMessage.textContent = message;
-            notification.className = `notification ${type}`;
-            
-            const icon = notification.querySelector('.notification-icon');
-            if (type === 'success') {
-                icon.className = 'fas fa-check-circle notification-icon';
-            } else {
-                icon.className = 'fas fa-exclamation-circle notification-icon';
-                
+        function showNotification(message, type = '') {
+            notification.className = 'notification'
+            notification.classList.add(type, 'show');
+            if (!notification) {
+                console.warn('Elemen notifikasi tidak ditemukan!');
+                return;
             }
+            // set message
+            notificationMessage.textContent = message
             
+            // reset class, replace sesuai type
+
+             // Ubah ikon & warna border sesuai tipe
+            if (type === 'success') {
+                notificationIcon.className = 'fas fa-check-circle notification-icon';
+                notification.style.backgroundColor = '#27ae60';
+            } else if (type === 'error') {
+                notificationIcon.className = 'fas fa-exclamation-circle notification-icon';
+                notification.style.backgroundColor = '#e74c3c';
+            } else if (type === 'warning') {
+                notificationIcon.className = 'fas fa-exclamation-triangle notification-icon';
+                notification.style.backgroundColor = '#f39c12';
+            } else {
+                // default / info
+                notificationIcon.className = 'fas fa-info-circle notification-icon';
+                notification.style.backgroundColor = '#3498db';
+            }
+
+            // Tampilkan
             notification.style.display = 'block';
             
-            // Auto hide after 5 seconds
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 5000);
-        }
+            // Sembunyikan otomatis setelah delay
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    
+                    // Opsional: benar-benar sembunyikan setelah animasi selesai
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                    }, 100); // sesuaikan dengan durasi transisi
+                }, type === 'success' ? 1000 : 2000); 
+            } 
         
         // Logout function
         function logout() {

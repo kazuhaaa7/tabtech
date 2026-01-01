@@ -401,23 +401,33 @@
             transition: opacity 3s ease, transform 3s ease;
             z-index: 1001;
             max-width: 400px;
+            font-weight: 500;
             pointer-events: none; /* non-interaktif saat tersembunyi */
         }
         .notification.show {
+            display: block;
             opacity: 1;
             transform: translateX(0);
             pointer-events: auto;
         }
         .notification.warning {
             background-color: #f39c12;
+            border-left: 5px solid #f39c12;
             
         }
         .notification.error {
             background-color: #e74c3c;
+            border-left: 5px solid #e74c3c;
         }
         
         .notification.success {
             background-color: #27ae60;
+            border-left: 5px solid #27ae60;
+
+        }
+        .notification.info{
+            border-left: 5px solid #3498db;
+
         }
         
         /* @keyframes slideInRight {
@@ -481,17 +491,18 @@
             .form-actions {
                 flex-direction: column;
             }
+            
 
         }
     </style>
 </head>
 <body>
-    Notification
+    <!-- Notification -->
      <div class="notification" id="notification">
         <div class="notification-header">
         <i class="fas fa-check-circle notification-icon"></i>
         <div class="notification-message" id="notificationMessage"></div>
-    </div>
+        </div>
      </div>
 
     <!-- <div id="notificationSuccess" class="notificationSuccess">
@@ -638,7 +649,7 @@
                 '<i class="fas fa-eye-slash"></i>' : 
                 '<i class="fas fa-eye"></i>';
         }); 
-        function showNotification(message, type = 'succes'){
+        function showNotification(message, type = ''){
             if (!notification) {
                 console.warn('Elemen notifikasi tidak ditemukan!');
                 return;
