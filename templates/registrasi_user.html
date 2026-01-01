@@ -274,7 +274,82 @@
             transform: none;
             box-shadow: none;
         }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px 30px;
+            color:white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            display: none;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: opacity 3s ease, transform 3s ease;
+            z-index: 1001;
+            max-width: 400px;
+            font-weight: 500;
+            pointer-events: none; /* non-interaktif saat tersembunyi */
+        }
+        .notification.show {
+            display: block;
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+        .notification.warning {
+            background-color: #f39c12;
+            border-left: 5px solid #f39c12;
+            
+        }
+        .notification.error {
+            background-color: #e74c3c;
+            border-left: 5px solid #e74c3c;
+        }
+        
+        .notification.success {
+            background-color: #27ae60;
+            border-left: 5px solid #27ae60;
 
+        }
+        .notification.info{
+            border-left: 5px solid #3498db;
+
+        }
+        .notification-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .notification-icon {
+            font-size: 1.8rem;
+        }
+
+        .notification.succes .notification-icon {
+            color: white;
+        }
+
+        .notification.error.notification-icon {
+            color: white;
+        }
+        .notification.warning .notification-icon  {
+            color: white;
+        }
+
+
+        .notification-message {
+            font-weight: 600;
+            font-size: 1.2rem;
+            line-height: 1.5;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* notif lama
         .notification {
             position: fixed;
             top: 20px;
@@ -331,7 +406,7 @@
         .notification-message {
             font-size: 1rem;
             line-height: 1.5;
-        }
+        } */
 
         .loader {
             display: none;
@@ -552,6 +627,7 @@
         const submitBtn = document.getElementById('submitBtn');
         const registerForm = document.getElementById('registerForm');
         const notification = document.getElementById('notification');
+        const notificationIcon = document.querySelector('.notification-icon');        
         const notificationMessage = document.getElementById('notificationMessage');
         const loader = document.getElementById('loader');
         
@@ -700,28 +776,70 @@
         
         // Show notification
         function showNotification(message, type = 'success') {
-            notificationMessage.textContent = message;
-            
-            // Update notification type
-            notification.className = 'notification ' + type;
-            const icon = notification.querySelector('.notification-icon');
-            
-            if (type === 'success') {
-                icon.className = 'fas fa-check-circle notification-icon';
-            } else if (type === 'error') {
-                icon.className = 'fas fa-exclamation-circle notification-icon';
-            } else if (type === 'warning') {
-                icon.className = 'fas fa-exclamation-triangle notification-icon';
+
+            if (!notification) {
+                console.warn('Elemen notifikasi tidak ditemukan!');
+                return;
             }
+            // set message
+            notificationMessage.textContent = message
             
-            // Show notification
+            // reset class, replace sesuai type
+            notification.className = 'notification'
+            notification.classList.add(type, 'show');
+
+             // Ubah ikon & warna border sesuai tipe
+            if (type === 'success') {
+                notificationIcon.className = 'fas fa-check-circle notification-icon';
+                notification.style.backgroundColor = '#27ae60';
+            } else if (type === 'error') {
+                notificationIcon.className = 'fas fa-exclamation-circle notification-icon';
+                notification.style.backgroundColor = '#e74c3c';
+            } else if (type === 'warning') {
+                notificationIcon.className = 'fas fa-exclamation-triangle notification-icon';
+                notification.style.backgroundColor = '#f39c12';
+            } else {
+                // default / info
+                notificationIcon.className = 'fas fa-info-circle notification-icon';
+                notification.style.backgroundColor = '#3498db';
+            }
+
+            // Tampilkan
             notification.style.display = 'block';
             
-            // Auto hide after 5 seconds
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 5000);
-        }
+            // Sembunyikan otomatis setelah delay
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    
+                    // Opsional: benar-benar sembunyikan setelah animasi selesai
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                    }, 100); // sesuaikan dengan durasi transisi
+                }, type === 'success' ? 1000 : 2000); 
+            } 
+
+                // notifikasi lama
+        //     notificationMessage.textContent = message;
+        //     // Update notification type
+        //     notification.className = 'notification ' + type;
+        //     const icon = notification.querySelector('.notification-icon');
+            
+        //     if (type === 'success') {
+        //         icon.className = 'fas fa-check-circle notification-icon';
+        //     } else if (type === 'error') {
+        //         icon.className = 'fas fa-exclamation-circle notification-icon';
+        //     } else if (type === 'warning') {
+        //         icon.className = 'fas fa-exclamation-triangle notification-icon';
+        //     }
+            
+        //     // Show notification
+        //     notification.style.display = 'block';
+            
+        //     // Auto hide after 5 seconds
+        //     setTimeout(() => {
+        //         notification.style.display = 'none';
+        //     }, 5000);
+        // }
         
         // Form submission
         registerForm.addEventListener('submit', async function(e) {
