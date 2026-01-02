@@ -107,7 +107,7 @@
             content: "---";
             position: absolute;
             color: #00d2ff;
-            font-size: 0.9rem;
+            font-size: 1.2rem;
             letter-spacing: 1px;
             top: 50%;
             transform: translateY(-50%);
@@ -491,6 +491,16 @@
             .form-actions {
                 flex-direction: column;
             }
+            .notification{
+                max-width: 400px;
+                padding: 10px 10px;
+                font-weight: 250px;
+                max-height: 75px;
+            }
+            .card-header::before, .card-header::after {
+            content: "---";
+            font-size: 0.9rem;
+        }
             
 
         }
@@ -532,7 +542,7 @@
         
         <div class="card">
             <div class="card-header">
-                HALAMAN VERIFIKASI
+                VERIFIKASI
             </div>
             
             <div class="login-container">
@@ -803,7 +813,7 @@
 
         // Go back to home
         function goBackToHome() {
-                showNotification('kembali ke halaman home!', 'warning');
+                showNotification('kembali ke home!', 'warning');
 
             // Clear form
             loginForm.reset();
@@ -829,14 +839,14 @@
             
             // Validation
             if (username === '') {
-                showNotification('Username tidak boleh kosong', 'warning');
+                showNotification('Username kosong', 'warning');
                 usernameInput.focus();
                 return; // Hentikan eksekusi
             }
 
             // Check if user wants to go back | recom: ganti icon
             if (username === '1') {
-                showNotification('Anda akan diarahkan ke halaman home', 'warning')
+                showNotification('kembali ke home!', 'warning')
                 usernameInput.focus();
                 setTimeout(()=> {
                     window.location.href = '/';

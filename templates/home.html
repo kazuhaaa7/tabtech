@@ -270,10 +270,6 @@
                 padding: 20px;
             }
             
-            .menu-item {
-                padding: 15px 20px;
-            }
-            
             .input-section {
                 padding: 20px;
             }
@@ -281,16 +277,38 @@
             .header h1 {
                 font-size: 2.2rem;
             }
+            .card-header::before, .card-header::after {
+            content: "---";
+            font-size: 0.9rem;
+        }
+            .menu {
+                padding: 25px;
+            }
             
-            .input-container {
+            .menu-item {
+                padding: 20px;
                 flex-direction: column;
+                text-align: center;
             }
-
-            .input-field {
-                width: 100%;
-                border-radius: 12px 12px 0 0;
+            
+            .menu-number {
+                margin-right: 0;
+                margin-bottom: 15px;
             }
-
+            
+            .menu-item-badge {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+            
+            .menu-icon {
+                margin-left: 0;
+                margin-top: 15px;
+            }
+            
+            .input-section {
+                padding: 25px;
+            }
             .input-btn {
                 width: 100%;
                 padding: 15px;

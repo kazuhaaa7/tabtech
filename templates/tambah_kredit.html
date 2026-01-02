@@ -1064,43 +1064,43 @@
             emptyTable.style.display = 'none';
             tableBody.innerHTML = '';
             
-            // Simulate API call
-            setTimeout(() => {
-                // Mock data - in real app, fetch from API
-                const mockData = [
-                    { no: 1, datee: '2024-01-15', debit: 500000, credit: 0, balance: 500000, information: 'Gaji bulanan', username: username },
-                    { no: 2, datee: '2024-01-20', debit: 0, credit: 200000, balance: 300000, information: 'Bayar listrik', username: username },
-                    { no: 3, datee: '2024-02-01', debit: 1000000, credit: 0, balance: 1300000, information: 'Bonus tahunan', username: username },
-                    { no: 4, datee: '2024-02-10', debit: 0, credit: 500000, balance: 800000, information: 'Belanja kebutuhan', username: username },
-                    { no: 5, datee: '2024-02-15', debit: 700000, credit: 0, balance: 1500000, information: 'Gaji bulan Februari', username: username }
-                ];
+            // // Simulate API call
+            // setTimeout(() => {
+            //     // Mock data - in real app, fetch from API
+            //     const mockData = [
+            //         { no: 1, datee: '2024-01-15', debit: 500000, credit: 0, balance: 500000, information: 'Gaji bulanan', username: username },
+            //         { no: 2, datee: '2024-01-20', debit: 0, credit: 200000, balance: 300000, information: 'Bayar listrik', username: username },
+            //         { no: 3, datee: '2024-02-01', debit: 1000000, credit: 0, balance: 1300000, information: 'Bonus tahunan', username: username },
+            //         { no: 4, datee: '2024-02-10', debit: 0, credit: 500000, balance: 800000, information: 'Belanja kebutuhan', username: username },
+            //         { no: 5, datee: '2024-02-15', debit: 700000, credit: 0, balance: 1500000, information: 'Gaji bulan Februari', username: username }
+            //     ];
                 
-                if (mockData.length === 0) {
-                    emptyTable.style.display = 'block';
-                } else {
-                    // Update current balance from last transaction
-                    currentBalance = mockData[mockData.length - 1].balance;
-                    document.getElementById('currentBalance').textContent = currentBalance.toLocaleString();
-                    document.getElementById('maxAmount').textContent = `Rp ${currentBalance.toLocaleString()}`;
+            //     if (mockData.length === 0) {
+            //         emptyTable.style.display = 'block';
+            //     } else {
+            //         // Update current balance from last transaction
+            //         currentBalance = mockData[mockData.length - 1].balance;
+            //         document.getElementById('currentBalance').textContent = currentBalance.toLocaleString();
+            //         document.getElementById('maxAmount').textContent = `Rp ${currentBalance.toLocaleString()}`;
                     
-                    // Populate table
-                    mockData.forEach(row => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td class="no-cell">${row.no}</td>
-                            <td class="date-cell">${row.datee}</td>
-                            <td class="debit-cell">${row.debit > 0 ? `Rp ${row.debit.toLocaleString()}` : '-'}</td>
-                            <td class="credit-cell">${row.credit > 0 ? `Rp ${row.credit.toLocaleString()}` : '-'}</td>
-                            <td class="balance-cell">Rp ${row.balance.toLocaleString()}</td>
-                            <td class="info-cell" title="${row.information}">${row.information}</td>
-                            <td class="user-cell">${row.username}</td>
-                        `;
-                        tableBody.appendChild(tr);
-                    });
-                }
+            //         // Populate table
+            //         mockData.forEach(row => {
+            //             const tr = document.createElement('tr');
+            //             tr.innerHTML = `
+            //                 <td class="no-cell">${row.no}</td>
+            //                 <td class="date-cell">${row.datee}</td>
+            //                 <td class="debit-cell">${row.debit > 0 ? `Rp ${row.debit.toLocaleString()}` : '-'}</td>
+            //                 <td class="credit-cell">${row.credit > 0 ? `Rp ${row.credit.toLocaleString()}` : '-'}</td>
+            //                 <td class="balance-cell">Rp ${row.balance.toLocaleString()}</td>
+            //                 <td class="info-cell" title="${row.information}">${row.information}</td>
+            //                 <td class="user-cell">${row.username}</td>
+            //             `;
+            //             tableBody.appendChild(tr);
+            //         });
+            //     }
                 
-                tableLoader.style.display = 'none';
-            }, 1000);
+            //     tableLoader.style.display = 'none';
+            // }, 1000);
         }
         
         // Form submission

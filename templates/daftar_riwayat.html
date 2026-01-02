@@ -411,7 +411,7 @@
 
         /* Table Container */
         .table-container {
-            overflow-x: hidden;
+            /* overflow-x: hidden; */
             border-radius: 15px;
             border: 1px solid #eee;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
@@ -800,6 +800,23 @@
             .data-table {
                 min-width: 1000px;
             }
+            .summary-item{
+                padding: 10px;
+                max-width: 200px;
+            }
+            .table-container{
+                width: 100%;
+                overflow-x: auto;
+                margin-bottom: 20px 0;
+            }
+            .user-avatar{
+                display: none;
+            }
+            #userName{
+                display: none;
+            }
+            
+
         }
     </style>
 </head>
@@ -914,7 +931,7 @@
                     </select>
                     <div class="search-box">
                         <i class="fas fa-search search-icon"></i>
-                        <input type="text" class="search-input" id="searchInput" placeholder="Cari transaksi...">
+                        <input type="text" class="search-input" id="searchInput" placeholder="Berdasarkan transaksi...">
                     </div>
                     <button class="export-btn" onclick="exportData()">
                         <i class="fas fa-file-export"></i>
@@ -1630,7 +1647,7 @@
     // updateElement('totalSaldo', saldo.total_saldo);
     // updateElement('totalMasuk', totalDebet);
     // updateElement('totalKeluar', totalKredit);
-    // updateText('totalTransaksi', allTransactions.length);
+    updateText('totalTransaksi', allTransactions.length);
 
    
 

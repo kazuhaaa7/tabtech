@@ -189,8 +189,8 @@ def regisUserSavings():
 @app.route("/api_registrasi_user/", methods=['POST'])  
 def api_registrasi_user():
     #  1. Validasi Content-Type
-    if not request.is_json:
-        return jsonify({'success': False, 'message': 'Content-Type must be application/json'}), 400
+    # if not request.is_json:
+    #     return jsonify({'success': False, 'message': 'Content-Type must be application/json'}), 400
     """API untuk registrasi user baru"""
     data = request.get_json()
     username = data.get('username').lower().strip()  
@@ -662,10 +662,10 @@ def tambah_saldo_page():
 @app.route('/api_get_saldo/', methods=['GET'])
 def api_get_saldo():
     """API untuk ambil saldo terakhir dan summary transaksi bulan ini"""
-    username = request.args.get('username')
+    # username = request.args.get('username')
     
-    if not username:
-        return jsonify({'error': 'Parameter username tidak ada'}), 400
+    # if not username:
+    #     return jsonify({'error': 'Parameter username tidak ada'}), 400
     
     try:
             # Koneksi ke database
@@ -717,15 +717,13 @@ def api_get_saldo():
 
 
 
-
-
 @app.route('/api_tambah_saldo/', methods=['POST'])
 def api_tambah_saldo():
     """API untuk tambah saldo"""
 
 
-    if not request.is_json:
-        return jsonify({"error": "Request harus berupa JSON"}), 400
+    # if not request.is_json:
+    #     return jsonify({"error": "Request harus berupa JSON"}), 400
     
     data = request.get_json()
     jumlah = data.get('jumlah')
@@ -1227,7 +1225,7 @@ def api_get_transaksi():
         if connection:
             connection.close()
 
-@app.route('/api_daftar_riwayat/')
+@app.route('/api_daftar_riwayat/', methods = ['POST'])
 def api_daftar_riwayat():
     """API untuk daftar riwayat"""
     if 'username' not in session:
