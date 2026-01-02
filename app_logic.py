@@ -11,6 +11,7 @@ from psycopg2 import Error
 from db.database import connect_db
 from dotenv import load_dotenv 
 
+# BLM BEST PRACTICE
 
 app = Flask(__name__)
 load_dotenv()
@@ -604,7 +605,7 @@ def api_menu_user():
     return render_template("tambah_saldo.html")
 
 
-@app.route('/tambah_saldo/')
+@app.route('/tambah_saldo/') # ga kepake
 def tambah_saldo_page():
     """halaman tambah saldo"""
     if 'username' not in session:
@@ -662,10 +663,10 @@ def tambah_saldo_page():
 @app.route('/api_get_saldo/', methods=['GET'])
 def api_get_saldo():
     """API untuk ambil saldo terakhir dan summary transaksi bulan ini"""
-    # username = request.args.get('username')
+    username = request.args.get('username')
     
-    # if not username:
-    #     return jsonify({'error': 'Parameter username tidak ada'}), 400
+    if not username:
+        return jsonify({'error': 'Parameter username tidak ada'}), 400
     
     try:
             # Koneksi ke database
